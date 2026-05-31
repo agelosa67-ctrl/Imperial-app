@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="90" fill="#1a6bff"/>
+  <path d="M256 90 C145 90 70 165 62 248 L256 248 L450 248 C442 165 367 90 256 90Z" fill="white" opacity="0.95"/>
+  <path d="M256 90 L256 248" stroke="#1a6bff" stroke-width="10" opacity="0.25"/>
+  <path d="M256 90 L170 245" stroke="#1a6bff" stroke-width="10" opacity="0.25"/>
+  <path d="M256 90 L342 245" stroke="#1a6bff" stroke-width="10" opacity="0.25"/>
+  <path d="M256 90 L115 210" stroke="#1a6bff" stroke-width="10" opacity="0.25"/>
+  <path d="M256 90 L397 210" stroke="#1a6bff" stroke-width="10" opacity="0.25"/>
+  <rect x="249" y="243" width="14" height="155" rx="7" fill="white" opacity="0.9"/>
+  <ellipse cx="256" cy="415" rx="70" ry="12" fill="#fbbf24" opacity="0.7"/>
+  <text x="256" y="480" font-family="Arial Black" font-size="48" font-weight="900" fill="white" text-anchor="middle" opacity="0.95">IB</text>
+</svg>
