@@ -357,29 +357,31 @@
         #status-popup {
             display: none; position: fixed; inset: 0;
             background: rgba(15,23,42,0.5); backdrop-filter: blur(4px);
-            z-index: 500; align-items: flex-end; justify-content: center;
+            z-index: 500; align-items: center; justify-content: center;
+            overflow-y: auto; padding: 16px;
         }
         #status-popup.open { display: flex; }
         .status-popup-card {
-            background: #fff; border-radius: 20px 20px 0 0;
-            padding: 20px 20px 36px;
-            width: 100%; max-width: 480px;
-            animation: slideUp 0.25s cubic-bezier(0.34,1.56,0.64,1);
+            background: #fff; border-radius: 18px;
+            padding: 16px 16px 20px;
+            width: 100%; max-width: 400px;
+            animation: slideUp 0.2s cubic-bezier(0.34,1.3,0.64,1);
+            max-height: 90vh; overflow-y: auto;
         }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes slideUp { from { transform: scale(0.9); opacity:0; } to { transform: scale(1); opacity:1; } }
         .status-popup-title {
-            font-size: 18px; font-weight: 800; text-align: center;
-            margin-bottom: 16px; color: var(--text);
+            font-size: 15px; font-weight: 800; text-align: center;
+            margin-bottom: 10px; color: var(--text);
         }
         .status-popup-btns {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            display: grid; grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px; margin-top: 10px;
         }
         .sp-btn {
-            padding: 16px 8px; border: 2px solid transparent;
-            border-radius: 14px; font-size: 15px; font-weight: 800;
+            padding: 10px 4px; border: 1.5px solid transparent;
+            border-radius: 10px; font-size: 11px; font-weight: 700;
             cursor: pointer; font-family: 'DM Sans', sans-serif;
-            transition: all 0.15s; text-align: center;
+            transition: all 0.15s; text-align: center; line-height: 1.3;
         }
         .sp-btn:active { transform: scale(0.95); }
         .sp-free     { background: #dcfce7; color: #16a34a; border-color: #86efac; }
@@ -435,11 +437,11 @@
             </div>
             <!-- Status buttons -->
             <div class="status-popup-btns">
-                <button class="sp-btn sp-free"     onclick="setStatusFromPopup('free')">✅ Διαθέσιμο</button>
-                <button class="sp-btn sp-reserved" onclick="setStatusFromPopup('reserved')">🔴 Κρατημένο</button>
-                <button class="sp-btn sp-hotel"    onclick="setStatusFromPopup('hotel')">🏨 Ξενοδοχείο</button>
-                <button class="sp-btn sp-special"  onclick="setStatusFromPopup('special')">⭐ Special</button>
-                <button class="sp-btn sp-broken"   onclick="setStatusFromPopup('broken')">🔧 Χαλασμένο</button>
+                <button class="sp-btn sp-free"     onclick="setStatusFromPopup('free')">✅<br>Διαθ.</button>
+                <button class="sp-btn sp-reserved" onclick="setStatusFromPopup('reserved')">🔴<br>Κρατ.</button>
+                <button class="sp-btn sp-hotel"    onclick="setStatusFromPopup('hotel')">🏨<br>Ξεν.</button>
+                <button class="sp-btn sp-special"  onclick="setStatusFromPopup('special')">⭐<br>Special</button>
+                <button class="sp-btn sp-broken"   onclick="setStatusFromPopup('broken')">🔧<br>Χαλ.</button>
                 <button class="sp-btn sp-close"    onclick="closeStatusPopup()">✕ Κλείσιμο</button>
             </div>
         </div>
