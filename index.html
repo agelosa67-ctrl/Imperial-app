@@ -209,30 +209,31 @@
             font-family: 'Bebas Neue', sans-serif;
             font-size: 13px; letter-spacing: 3px; color: var(--muted);
             margin-bottom: 8px; padding-left: 2px;
+            user-select: none;
         }
         .row-cards-container {
             display: flex; flex-wrap: nowrap !important; gap: 8px;
             overflow-x: auto; padding-bottom: 6px;
+            cursor: grab;
+            user-select: none;
         }
         .row-cards-container::-webkit-scrollbar { height: 4px; }
         .row-cards-container::-webkit-scrollbar-track { background: transparent; }
         .row-cards-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-
         /* ── UMBRELLA CARD ── */
         .umbrella-card {
             background: var(--surface);
-            border-radius: 16px;
-            padding: 8px 6px 8px;
+            border-radius: 12px;
+            padding: 6px 5px 8px;
             border: 2px solid var(--border);
-            flex: 0 0 118px;
+            flex: 0 0 110px;
             display: flex; flex-direction: column; align-items: center;
             position: relative;
             transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
         }
         .umbrella-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
 
-        /* Χρωματιστό border ανάλογα status */
         .umbrella-card[data-status="reserved"] { border-color: var(--danger);  box-shadow: 0 0 0 1px var(--danger);  }
         .umbrella-card[data-status="hotel"]    { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
         .umbrella-card[data-status="special"]  { border-color: var(--purple);  box-shadow: 0 0 0 1px var(--purple);  }
@@ -245,14 +246,13 @@
         }
         .delete-icon:hover { color: var(--danger); }
 
-        /* ── UMBRELLA ICON — μεγάλο και χρωματιστό ── */
+        /* ── UMBRELLA ICON ── */
         .icon-box {
             width: 80px; height: 68px;
             position: relative; margin: 2px 0 6px;
         }
         .umbrella-svg { width: 100%; height: 100%; }
 
-        /* Αριθμός — μεγάλος Bebas Neue */
         .umb-number-badge {
             position: absolute;
             top: 13px; left: 50%;
@@ -264,8 +264,9 @@
             text-shadow: 0 1px 4px rgba(0,0,0,0.3);
         }
 
-        .inputs-form { width: 100%; display: flex; flex-direction: column; gap: 2px; }
-        .input-field {
+        .inputs-form { width: 90%; display: flex; flex-direction: column; gap: 3px; margin: 4px auto 0; }
+        
+        .input-field, .card-inline-field {
             width: 100%; border: none;
             border-bottom: 1px solid #e2e8f0;
             background: transparent; padding: 3px 2px;
@@ -273,10 +274,9 @@
             text-align: center; color: var(--text);
             font-family: 'DM Sans', sans-serif; transition: border-color 0.2s;
         }
-        .input-field::placeholder { color: #cbd5e1; }
-        .input-field:focus { border-bottom-color: var(--primary); }
+        .input-field::placeholder, .card-inline-field::placeholder { color: #cbd5e1; }
+        .input-field:focus, .card-inline-field:focus { border-bottom-color: var(--primary); }
 
-        /* Status buttons */
         .status-row {
             display: flex; flex-direction: column;
             width: 100%; gap: 2px;
@@ -318,7 +318,7 @@
         .hdr-btn.recovery-btn { background: #fef3c7; color: #d97706; border: 1px solid #fcd34d; }
         .hdr-btn.history-btn  { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
 
-        /* ── RECOVERY & HISTORY PANELS ── */
+        /* ── SIDE PANELS ── */
         .side-panel {
             display: none; position: fixed; inset: 0;
             background: rgba(15,23,42,0.5); backdrop-filter: blur(4px);
@@ -405,6 +405,15 @@
         .ov-legend-item { display: flex; align-items: center; gap: 3px; font-size: 9px; font-weight: 600; color: var(--muted); }
         .ov-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
 
+        .staff-btn {
+            padding: 7px 12px; border: 1.5px solid #e2e8f0; border-radius: 20px;
+            background: #f8fafc; color: var(--text); font-size: 12px; font-weight: 700;
+            cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .staff-btn:active { transform: scale(0.95); }
+        .staff-btn.selected { background: #dbeafe; color: #1d6fe8; border-color: #93c5fd; }
+
         /* ── STATUS POPUP ── */
         #status-popup {
             display: none; position: fixed; inset: 0;
@@ -463,11 +472,6 @@
         .confirm-title { font-size: 17px; font-weight: 700; color: var(--text); text-align: center; margin: 0; }
         .confirm-sub { font-size: 13px; color: var(--muted); text-align: center; margin: 0; }
         .confirm-btns { display: flex; gap: 10px; width: 100%; margin-top: 8px; }
-        .confirm-btns button {
-            flex: 1; padding: 12px; border: none; border-radius: 12px;
-            font-size: 14px; font-weight: 700; cursor: pointer;
-            font-family: 'DM Sans', sans-serif; transition: all 0.15s;
-        }
         .confirm-cancel { background: #f1f5f9; color: var(--muted); }
         .confirm-cancel:hover { background: #e2e8f0; }
         .confirm-ok { background: var(--danger); color: #fff; }
@@ -476,18 +480,36 @@
 </head>
 <body>
 
-
     <!-- STATUS POPUP -->
     <div id="status-popup" onclick="if(event.target===this)closeStatusPopup()">
         <div class="status-popup-card">
             <div class="status-popup-title" id="status-popup-title">Ομπρέλα 000</div>
-            <!-- Fields -->
             <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
-                <input id="sp-name"  type="text" placeholder="Όνομα"      style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" oninput="updatePopupField('name',this.value)">
-                <input id="sp-time"  type="text" placeholder="Ώρα"        style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" oninput="updatePopupField('time',this.value)">
-                <input id="sp-notes" type="text" placeholder="Σημειώσεις" style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" oninput="updatePopupField('notes',this.value)">
+                <div>
+                    <div style="font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:4px;">ΥΠΑΛΛΗΛΟΣ</div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                        <button class="staff-btn" onclick="selectStaff('Edisa')">Edisa</button>
+                        <button class="staff-btn" onclick="selectStaff('Anananias')">Anananias</button>
+                        <button class="staff-btn" onclick="selectStaff('Savvas')">Savvas</button>
+                        <button class="staff-btn" onclick="selectStaff('Sidorela')">Sidorela</button>
+                    </div>
+                    <div id="sp-staff-display" style="font-size:11px;color:#1d6fe8;font-weight:700;margin-top:4px;min-height:16px;"></div>
+                </div>
+                <input id="sp-customer" type="text" placeholder="Όνομα πελάτη" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('customer',this.value)">
+                <input id="sp-time" type="text" placeholder="Ώρα" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('time',this.value)">
+                
+                <!-- ΥΠΟΛΟΓΙΣΤΗΣ ΚΑΤΑΝΑΛΩΣΗΣ ΣΤΟ POPUP -->
+                <div style="position:relative; width:100%;">
+                    <input id="sp-consumption" type="text" placeholder="Κατανάλωση (€) π.χ. 10+5+20" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;padding-right:75px;" oninput="updatePopupField('consumption',this.value); updatePopupConsumptionTotal(this.value);">
+                    <span id="sp-consumption-total" style="position:absolute; right:12px; top:11px; font-size:13px; font-weight:700; color:var(--success); pointer-events:none;"></span>
+                </div>
+
+                <input id="sp-notes" type="text" placeholder="Σημειώσεις" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('notes',this.value)">
+                <input id="sp-notes2" type="text" placeholder="Extra σημειώσεις" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('notes2',this.value)">
+                
+                <!-- ΠΕΔΙΟ ΣΥΝΔΕΣΗΣ ΠΟΛΛΑΠΛΩΝ ΟΜΠΡΕΛΩΝ -->
+                <input id="sp-linked" type="text" placeholder="🔗 Συνδεδεμένες ομπρέλες (π.χ. 102, 103)" style="padding:9px 12px;border:1.5px solid #bfdbfe;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;background:#f0f7ff;">
             </div>
-            <!-- Status buttons -->
             <div class="status-popup-btns">
                 <button class="sp-btn sp-free"     onclick="setStatusFromPopup('free')">✅<br>Διαθ.</button>
                 <button class="sp-btn sp-reserved" onclick="setStatusFromPopup('reserved')">🔴<br>Κρατ.</button>
@@ -538,11 +560,9 @@
         </div>
     </div>
 
+    <!-- PIN OVERLAY -->
     <div id="pin-overlay">
-        <div class="pin-logo">
-            Imperial Beach
-            <small>MANAGEMENT SUITE</small>
-        </div>
+        <div class="pin-logo">Imperial Beach<small>MANAGEMENT SUITE</small></div>
         <div class="pin-card">
             <h3>🔒 Εισάγετε Κωδικό</h3>
             <div class="pin-dots">
@@ -572,8 +592,8 @@
         </div>
     </div>
 
+    <!-- HEADER -->
     <header>
-        <!-- ROW 1: zoom | action btns | date -->
         <input type="date" id="globalDate" style="display:none" onchange="changeWorkingDate()">
         <div class="header-row1">
             <div class="zoom-controls">
@@ -588,9 +608,7 @@
                 <button class="hdr-btn overview-btn" id="overview-btn" onclick="toggleOverview()" title="Χάρτης">🗺</button>
                 <button class="hdr-btn danger-clear" onclick="clearDay()" title="Εκκαθάριση" style="font-size:9px;padding:3px 5px;">🗑</button>
             </div>
-
         </div>
-        <!-- ROW 2: stat badges | search | action btns -->
         <div class="header-row2">
             <div class="stats-container">
                 <div class="stat-badge active" id="badge-all" onclick="setStatusFilter('all')">
@@ -622,8 +640,6 @@
         </div>
     </main>
 
-
-
     <!-- OVERVIEW PANEL -->
     <div id="overview-panel">
         <div class="overview-topbar">
@@ -641,11 +657,10 @@
     </div>
 
     <script>
-        // ── PIN ──────────────────────────────────────────────────────
+        // ── PIN SYSTEM ──────────────────────────────────────────────
         const CORRECT_PIN = '2580';
         let pinEntered = '';
 
-        // Έλεγχος αν έχει αποθηκευτεί το unlock
         if (localStorage.getItem('beach_auth') === 'ok') {
             document.getElementById('pin-overlay').style.display = 'none';
         }
@@ -675,7 +690,7 @@
             }
         }
 
-        // ── FIREBASE ────────────────────────────────────────────────
+        // ── FIREBASE INITIALIZATION ─────────────────────────────────
         const firebaseConfig = {
             apiKey: "AIzaSyC26pjtV6oNq5E1wfRyMoXIGkRS9y9ly_g",
             authDomain: "imperial-kratisis.firebaseapp.com",
@@ -692,11 +707,34 @@
         let overviewOpen = false;
         let recoveryOpen = false;
         let historyOpen = false;
+        const ADMIN_PIN = '0852';
+        let adminUnlocked = false;
+        let adminTimer = null;
+
+        function requireAdmin(callback) {
+            if (adminUnlocked) { callback(); return; }
+            const pin = prompt('🔐 Κωδικός Admin:');
+            if (pin === ADMIN_PIN) {
+                adminUnlocked = true;
+                clearTimeout(adminTimer);
+                adminTimer = setTimeout(() => { adminUnlocked = false; }, 5 * 60 * 1000);
+                callback();
+            } else if (pin !== null) {
+                alert('❌ Λάθος κωδικός!');
+            }
+        }
 
         function toggleRecovery() {
-            recoveryOpen = !recoveryOpen;
-            document.getElementById('recovery-panel').classList.toggle('open', recoveryOpen);
-            if (recoveryOpen) loadRecovery();
+            if (!recoveryOpen) {
+                requireAdmin(() => {
+                    recoveryOpen = true;
+                    document.getElementById('recovery-panel').classList.add('open');
+                    loadRecovery();
+                });
+            } else {
+                recoveryOpen = false;
+                document.getElementById('recovery-panel').classList.remove('open');
+            }
         }
 
         function loadRecovery() {
@@ -704,7 +742,6 @@
                 const data = snap.val() || {};
                 const now = Date.now();
                 let html = '';
-                // Clean expired
                 Object.entries(data).forEach(([key, item]) => {
                     if (item.expiresAt < now) {
                         database.ref('recovery/'+key).remove();
@@ -739,9 +776,16 @@
         }
 
         function toggleHistory() {
-            historyOpen = !historyOpen;
-            document.getElementById('history-panel').classList.toggle('open', historyOpen);
-            if (historyOpen) loadHistory();
+            if (!historyOpen) {
+                requireAdmin(() => {
+                    historyOpen = true;
+                    document.getElementById('history-panel').classList.add('open');
+                    loadHistory();
+                });
+            } else {
+                historyOpen = false;
+                document.getElementById('history-panel').classList.remove('open');
+            }
         }
 
         function loadHistory() {
@@ -767,16 +811,40 @@
                     '<p style="color:var(--muted);text-align:center;font-size:12px">Δεν υπάρχει ιστορικό</p>';
             });
         }
+
         let popupCurrentNum = null;
 
         function openStatusPopup(num) {
             popupCurrentNum = num;
             document.getElementById('status-popup-title').textContent = 'Ομπρέλα ' + num;
             const b = (dailyBookings || {})[num] || {};
-            document.getElementById('sp-name').value  = b.name  || '';
-            document.getElementById('sp-time').value  = b.time  || '';
-            document.getElementById('sp-notes').value = b.notes || '';
+            document.getElementById('sp-staff-display').textContent = b.staff ? '✓ ' + b.staff : '';
+            document.querySelectorAll('.staff-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.textContent === b.staff);
+            });
+            document.getElementById('sp-time').value       = b.time        || '';
+            document.getElementById('sp-customer').value    = b.customer    || '';
+            document.getElementById('sp-consumption').value = b.consumption || '';
+            updatePopupConsumptionTotal(b.consumption || '');
+            document.getElementById('sp-notes').value       = b.notes       || '';
+            document.getElementById('sp-notes2').value      = b.notes2      || '';
+            
+            document.getElementById('sp-linked').value     = '';
+            
             document.getElementById('status-popup').classList.add('open');
+        }
+
+        // ΑΛΛΑΓΗ 1: ΕΠΙΛΟΓΗ & ΑΦΑΙΡΕΣΗ ΥΠΑΛΛΗΛΟΥ ΜΕ ΔΕΥΤΕΡΟ ΚΛΙΚ
+        function selectStaff(name) {
+            if (!popupCurrentNum) return;
+            const currentStaff = (dailyBookings[popupCurrentNum] || {}).staff || '';
+            const newName = (currentStaff === name) ? '' : name;
+            
+            updatePopupField('staff', newName);
+            document.getElementById('sp-staff-display').textContent = newName ? '✓ ' + newName : '';
+            document.querySelectorAll('.staff-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.textContent === newName);
+            });
         }
 
         function updatePopupField(field, value) {
@@ -787,10 +855,89 @@
             document.getElementById('status-popup').classList.remove('open');
             popupCurrentNum = null;
         }
+
         function setStatusFromPopup(status) {
             if (!popupCurrentNum) return;
-            setStatus(popupCurrentNum, status);
+            const currentStatus = (dailyBookings[popupCurrentNum] || {}).status || 'free';
+            
+            // Έλεγχος Admin αν πάμε να αλλάξουμε μια ήδη Κρατημένη ομπρέλα
+            if (currentStatus === 'reserved' && status !== 'reserved') {
+                requireAdmin(() => {
+                    executeStatusChange(status);
+                });
+            } else {
+                executeStatusChange(status);
+            }
+        }
+
+        // ΑΛΛΑΓΗ 2: ΟΤΑΝ ΓΙΝΕΤΑΙ ΔΙΑΘΕΣΙΜΗ, ΣΒΗΝΟΝΤΑΙ ΟΛΑ ΜΟΝΟ ΣΤΗ ΣΥΓΚΕΚΡΙΜΕΝΗ ΟΜΠΡΕΛΑ
+        function executeStatusChange(status) {
+            const d = document.getElementById('globalDate').value;
+            
+            if (status === 'free') {
+                database.ref('bookings_by_date/' + d + '/' + popupCurrentNum).set({
+                    status: 'free',
+                    customer: '',
+                    staff: '',
+                    time: '',
+                    consumption: '',
+                    notes: '',
+                    notes2: ''
+                });
+            } else {
+                setStatus(popupCurrentNum, status);
+            }
+            
+            const linkedValue = document.getElementById('sp-linked').value;
+            if (linkedValue.trim() !== '') {
+                const linkedUmbrellas = linkedValue.split(/[\s,]+/).filter(id => id.trim() !== '');
+                
+                const customer = status === 'free' ? '' : document.getElementById('sp-customer').value;
+                const time = status === 'free' ? '' : document.getElementById('sp-time').value;
+                const consumption = status === 'free' ? '' : document.getElementById('sp-consumption').value;
+                const notes = status === 'free' ? '' : document.getElementById('sp-notes').value;
+                const notes2 = status === 'free' ? '' : document.getElementById('sp-notes2').value;
+                const staff = status === 'free' ? '' : ((dailyBookings[popupCurrentNum] || {}).staff || '');
+
+                linkedUmbrellas.forEach(num => {
+                    if (masterUmbrellasList[num]) {
+                        database.ref('bookings_by_date/' + d + '/' + num).set({
+                            status: status,
+                            customer: customer,
+                            staff: staff,
+                            time: time,
+                            consumption: consumption,
+                            notes: notes,
+                            notes2: notes2
+                        });
+                    }
+                });
+            }
+            
             closeStatusPopup();
+        }
+
+        // ΑΛΛΑΓΗ 3: ΣΥΝΑΡΤΗΣΕΙΣ ΥΠΟΛΟΓΙΣΤΗ (CALCULATOR) ΓΙΑ ΤΗΝ ΚΑΤΑΝΑΛΩΣΗ
+        function safeEvalConsumption(val) {
+            if (!val) return 0;
+            let sanitized = val.toString().replace(/[^0-9+\-*/().\s]/g, '');
+            if (!sanitized.trim()) return 0;
+            try {
+                let res = new Function('return ' + sanitized)();
+                return (typeof res === 'number' && !isNaN(res)) ? Number(res.toFixed(2)) : 0;
+            } catch(e) {
+                return 0;
+            }
+        }
+
+        function updatePopupConsumptionTotal(val) {
+            const totalEl = document.getElementById('sp-consumption-total');
+            if (!val) {
+                totalEl.textContent = '';
+                return;
+            }
+            let total = safeEvalConsumption(val);
+            totalEl.textContent = total ? '= ' + total + '€' : '';
         }
 
         function toggleOverview() {
@@ -823,6 +970,7 @@
             });
             document.getElementById('overview-content').innerHTML = html || '<p style="color:var(--muted);text-align:center;padding:20px">Φόρτωση...</p>';
         }
+
         let dailyBookings = {};
         let currentZoomFactor = 1.0;
         let activeStatusFilter = 'all';
@@ -831,7 +979,6 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('globalDate').value = today;
             startLiveSync();
-            // Auto-cleanup recovery every hour
             setInterval(() => {
                 database.ref('recovery').once('value', snap => {
                     const data = snap.val() || {};
@@ -850,14 +997,12 @@
             const s = currentZoomFactor;
             el.style.transform = `scale(${s})`;
             el.style.width = `${100/s}%`;
-            // Fix the gap: set outer height to match scaled content
             requestAnimationFrame(() => {
                 document.getElementById('zoom-outer').style.height = Math.ceil(el.scrollHeight * s) + 'px';
             });
             document.getElementById('zoom-label').textContent = Math.round(s*100) + '%';
         }
 
-        // Πάτα το % για reset στο 100%
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('zoom-label').addEventListener('click', () => applyZoom(0.0));
         });
@@ -895,11 +1040,11 @@
             database.ref('master_umbrellas/'+n).set({number:n});
         }
 
-        function deleteUmbrella(num) {
+        function deleteUmbrella(num) { requireAdmin(() => _deleteUmbrella(num)); }
+        function _deleteUmbrella(num) {
             if (!confirm("Διαγραφή ομπρέλας "+num+" μόνιμα;")) return;
             const d = document.getElementById('globalDate').value;
             const booking = (dailyBookings || {})[num] || {};
-            // Save to recovery with 24h expiry
             const recoveryData = {
                 num: num,
                 booking: booking,
@@ -912,7 +1057,8 @@
             database.ref('bookings_by_date/'+d+'/'+num).remove();
         }
 
-        function clearDay() {
+        function clearDay() { requireAdmin(() => _clearDay()); }
+        function _clearDay() {
             const d = document.getElementById('globalDate').value;
             showConfirm(
                 '🗑️ Εκκαθάριση ' + d + ';',
@@ -937,10 +1083,44 @@
             document.getElementById('confirm-modal').classList.remove('open');
             confirmCallback = null;
         }
-        // Close on backdrop click
         document.getElementById('confirm-modal').addEventListener('click', function(e) {
             if (e.target === this) closeConfirm();
         });
+
+        function enableDragScroll() {
+            const containers = document.querySelectorAll('.row-cards-container');
+            containers.forEach(container => {
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+
+                container.addEventListener('mousedown', (e) => {
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+                    isDown = true;
+                    container.style.cursor = 'grabbing';
+                    startX = e.pageX - container.offsetLeft;
+                    scrollLeft = container.scrollLeft;
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    container.style.cursor = 'grab';
+                });
+
+                container.addEventListener('mouseup', () => {
+                    isDown = false;
+                    container.style.cursor = 'grab';
+                });
+
+                container.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - container.offsetLeft;
+                    const walk = (x - startX) * 1.5;
+                    container.scrollLeft = scrollLeft - walk;
+                });
+            });
+        }
 
         function renderDashboard() {
             const wrapper = document.getElementById('zoom-wrapper');
@@ -984,7 +1164,6 @@
                 grouped[rowKey].forEach(num => {
                     const b = dailyBookings[num] || {status:'free'};
 
-                    // Χρώματα — έντονα και γεμάτα
                     let fillColor, textColor, bgTint;
                     switch(b.status) {
                         case 'reserved': fillColor='#ef233c'; textColor='#fff';    bgTint='#fff1f2'; break;
@@ -998,32 +1177,27 @@
                     card.className = 'umbrella-card';
                     card.setAttribute('data-status', b.status);
                     card.setAttribute('data-number', num);
-                    card.setAttribute('data-name', (b.name||'').toLowerCase());
+                    card.setAttribute('data-name', (b.customer||'').toLowerCase());
                     card.style.background = bgTint;
 
+                    // ΑΛΛΑΓΗ ΣΤΟ CARD INPUT: type="text" για να δέχεται πράξεις και tooltip με το Σύνολο
                     card.innerHTML = `
                         <button class="delete-icon" onclick="deleteUmbrella('${num}')">&times;</button>
                         <div class="icon-box" onclick="openStatusPopup(${num})" style="cursor:pointer">
                             <span class="umb-number-badge" style="color:${textColor};">${num}</span>
                             <svg class="umbrella-svg" viewBox="0 0 100 100">
-                                <!-- Ομπρέλα γεμάτη με έντονο χρώμα -->
                                 <path d="M 10 52 Q 50 5 90 52 Z" fill="${fillColor}"/>
-                                <!-- Φωτεινή λεπτομέρεια πάνω -->
                                 <path d="M 10 52 Q 50 5 90 52" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
-                                <!-- Ανταύγεια στην κορυφή -->
                                 <path d="M 30 38 Q 50 12 70 38" fill="rgba(255,255,255,0.18)" />
-                                <!-- Βάση / κοτσάνι -->
                                 <rect x="48" y="52" width="4" height="38" fill="#334155" rx="2"/>
-                                <!-- Κάμψη στην άκρη -->
                                 <path d="M 44 88 Q 50 96 56 88" stroke="#334155" stroke-width="3" fill="none" stroke-linecap="round"/>
                             </svg>
                         </div>
                         <div class="inputs-form">
-                            <input type="text" class="input-field" placeholder="Όνομα"      value="${b.name||''}"  onchange="updateField('${num}','name',this.value)">
-                            <input type="text" class="input-field" placeholder="Ώρα"        value="${b.time||''}"  onchange="updateField('${num}','time',this.value)">
-                            <input type="text" class="input-field" placeholder="Σημειώσεις" value="${b.notes||''}" onchange="updateField('${num}','notes',this.value)">
+                            <input class="card-inline-field card-staff-field" placeholder="Υπαλ." value="${b.staff||''}" onchange="updateField('${num}','staff',this.value)" onclick="event.stopPropagation()">
+                            <input class="card-inline-field card-consumption-field" placeholder="€" type="text" value="${b.consumption||''}" onchange="updateField('${num}','consumption',this.value)" onclick="event.stopPropagation()" title="Σύνολο: ${safeEvalConsumption(b.consumption)}€">
+                            <input class="card-inline-field card-notes-field" placeholder="Σημ." value="${b.notes||''}" onchange="updateField('${num}','notes',this.value)" onclick="event.stopPropagation()">
                         </div>
-
                     `;
                     container.appendChild(card);
                 });
@@ -1038,6 +1212,8 @@
             document.getElementById('stat-hotel').innerText = hotel;
             document.getElementById('stat-spec').innerText = spec;
             document.getElementById('stat-broken').innerText = broken;
+
+            enableDragScroll();
         }
 
         function updateField(num, field, val) {
