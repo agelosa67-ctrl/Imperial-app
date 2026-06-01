@@ -24,6 +24,7 @@
             --warning:  #f59e0b;
             --purple:   #7c3aed;
             --danger:   #ef233c;
+            --together: #92400e;
             --free-col: #94a3b8;
             --bg:       #eef2f7;
             --surface:  #ffffff;
@@ -203,6 +204,7 @@
         .umbrella-card[data-status="hotel"]    { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
         .umbrella-card[data-status="special"]  { border-color: var(--purple);  box-shadow: 0 0 0 1px var(--purple);  }
         .umbrella-card[data-status="broken"]   { border-color: var(--warning); box-shadow: 0 0 0 1px var(--warning); }
+        .umbrella-card[data-status="together"] { border-color: var(--together); box-shadow: 0 0 0 1px var(--together); }
 
         .delete-icon {
             position: absolute; top: 4px; right: 6px;
@@ -252,6 +254,27 @@
         }
         .side-panel-body { padding: 12px; overflow-y: auto; flex: 1; }
         
+        /* ── OVERVIEW CELLS ── */
+        .ov-legend { display: flex; flex-wrap: wrap; gap: 8px; padding: 6px 12px; background: var(--surface); border-radius: 10px; margin-bottom: 8px; }
+        .ov-legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: var(--muted); }
+        .ov-legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .ov-free     { background: #86efac; color: #14532d; }
+        .ov-reserved { background: #fca5a5; color: #7f1d1d; }
+        .ov-hotel    { background: #93c5fd; color: #1e3a8a; }
+        .ov-special  { background: #c4b5fd; color: #3b0764; }
+        .ov-broken   { background: #fcd34d; color: #78350f; }
+        .ov-together { background: #d97706; color: #fff; }
+
+        /* ── HISTORY ITEMS ── */
+        .history-date-group { margin-bottom: 12px; }
+        .history-date-label { font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 1px; margin-bottom: 6px; text-transform: uppercase; }
+        .history-item { font-size: 11px; padding: 5px 8px; border-radius: 8px; background: #f8fafc; margin-bottom: 3px; border-left: 3px solid var(--border); }
+
+        /* ── RECOVERY ITEMS ── */
+        .recovery-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8fafc; border-radius: 8px; margin-bottom: 6px; gap: 8px; }
+        .recovery-item-info { flex: 1; }
+        .recovery-item-info strong { display: block; font-size: 12px; }
+        .recovery-item-info span { font-size: 10px; color: var(--muted); }
         /* ── OVERVIEW PANEL ── */
         #overview-panel {
             display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow: auto; padding: 10px;
@@ -312,6 +335,7 @@
         .sp-hotel    { background: #dbeafe; color: #1d6fe8; border-color: #93c5fd; }
         .sp-special  { background: #ede9fe; color: #7c3aed; border-color: #c4b5fd; }
         .sp-broken   { background: #fef3c7; color: #d97706; border-color: #fcd34d; }
+        .sp-together { background: #fef3c7; color: #92400e; border-color: #d97706; }
         .sp-close    { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; grid-column: 1/-1; font-weight: bold; font-size: 13px; margin-top: 5px; }
 
         /* ── CONFIRM MODAL ── */
@@ -359,8 +383,7 @@
                 <input id="sp-notes" type="text" placeholder="Σημειώσεις" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('notes',this.value)">
                 <input id="sp-notes2" type="text" placeholder="Extra σημειώσεις" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('notes2',this.value)">
                 
-                <input id="sp-linked" type="text" placeholder="🔗 Συνδεδεμένες ομπρέλες (π.χ. 102, 103)" style="padding:9px 12px;border:1.5px solid #bfdbfe;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;background:#f0f7ff;">
-                <button type="button" onclick="syncLinkedUmbrellas()" style="padding:11px; background:#1e293b; color:white; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.1)">🔗 Χειροκίνητος Συγχρονισμός Σημειώσεων</button>
+                <input id="sp-linked" type="text" placeholder="🔗 Συνδεδεμένες ομπρέλες (π.χ. 102, 103)" onchange="autoSyncLinkedCoreFields()" style="padding:9px 12px;border:1.5px solid #bfdbfe;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;background:#f0f7ff;">
             </div>
             <div class="status-popup-btns">
                 <button class="sp-btn sp-free"     onclick="setStatusFromPopup('free')">✅<br>Διαθ.</button>
@@ -368,6 +391,7 @@
                 <button class="sp-btn sp-hotel"    onclick="setStatusFromPopup('hotel')">🏨<br>Ξεν.</button>
                 <button class="sp-btn sp-special"  onclick="setStatusFromPopup('special')">⭐<br>Special</button>
                 <button class="sp-btn sp-broken"   onclick="setStatusFromPopup('broken')">🔧<br>Χαλ.</button>
+                <button class="sp-btn sp-together" onclick="setStatusFromPopup('together')">Κρ. Μαζί</button>
                 <button class="sp-btn sp-close"    onclick="closeStatusPopup()">✕ Κλείσιμο Παραθύρου</button>
             </div>
         </div>
@@ -403,7 +427,10 @@
         <div class="side-panel-card">
             <div class="side-panel-header">
                 <h3>📋 Ιστορικό Κρατήσεων</h3>
-                <button onclick="toggleHistory()">✕</button>
+                <div style="display:flex;gap:6px;align-items:center;">
+                    <button onclick="saveDailyBackup()" style="background:#fef3c7;color:#d97706;border:1px solid #fcd34d;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">💾 Backup 16ώρ.</button>
+                    <button onclick="toggleHistory()">✕</button>
+                </div>
             </div>
             <div class="side-panel-body" id="history-body">
                 <p style="color:var(--muted);text-align:center;font-size:12px">Φόρτωση...</p>
@@ -494,6 +521,9 @@
                 <div class="stat-badge" id="badge-broken" style="color:var(--warning)" onclick="setStatusFilter('broken')">
                     Χαλ <span class="stat-num" id="stat-broken">0</span>
                 </div>
+                <div class="stat-badge" id="badge-together" style="color:var(--together)" onclick="setStatusFilter('together')">
+                    Κρ.Μαζί <span class="stat-num" id="stat-together">0</span>
+                </div>
             </div>
             <input type="text" id="searchBar" class="search-input" placeholder="🔍 Νο ή Όνομα..." oninput="filterUmbrellas()">
         </div>
@@ -517,6 +547,7 @@
             <div class="ov-legend-item"><div class="ov-legend-dot" style="background:#93c5fd"></div>Ξεν</div>
             <div class="ov-legend-item"><div class="ov-legend-dot" style="background:#c4b5fd"></div>Sp</div>
             <div class="ov-legend-item"><div class="ov-legend-dot" style="background:#fcd34d"></div>Χαλ</div>
+            <div class="ov-legend-item"><div class="ov-legend-dot" style="background:#d97706"></div>Κρ.Μαζί</div>
         </div>
         <div id="overview-content"></div>
     </div>
@@ -701,26 +732,86 @@
         }
 
         function loadHistory() {
-            database.ref('bookings_by_date').once('value', snap => {
-                const data = snap.val() || {};
-                const dates = Object.keys(data).sort().reverse();
-                let html = '';
-                dates.forEach(date => {
-                    const bookings = data[date];
-                    const reserved = Object.values(bookings).filter(b => b.status && b.status !== 'free');
-                    if (!reserved.length) return;
-                    html += `<div class="history-date-group">
-                        <div class="history-date-label">${date}</div>`;
-                    reserved.forEach(b => {
-                        html += `<div class="history-item">
-                            <strong>Ομπρέλα ${b.number||''}</strong> · ${b.name||'-'} · <span style="color:var(--muted)">${b.status||''}</span>
-                            ${b.time?' · '+b.time:''} ${b.notes?' · '+b.notes:''}
-                        </div>`;
-                    });
-                    html += '</div>';
+            const today = document.getElementById('globalDate').value;
+            // Carica il backup giornaliero (16h TTL) + storico completo
+            database.ref('daily_backup').once('value', backupSnap => {
+                const backupData = backupSnap.val() || {};
+                const now = Date.now();
+                // Pulizia backup scaduti
+                Object.entries(backupData).forEach(([key, item]) => {
+                    if (item.expiresAt && item.expiresAt < now) {
+                        database.ref('daily_backup/' + key).remove();
+                    }
                 });
-                document.getElementById('history-body').innerHTML = html ||
-                    '<p style="color:var(--muted);text-align:center;font-size:12px">Δεν υπάρχει ιστορικό</p>';
+
+                database.ref('bookings_by_date').once('value', snap => {
+                    const data = snap.val() || {};
+                    const dates = Object.keys(data).sort().reverse();
+                    let html = '';
+
+                    // Εμφάνιση backup ημέρας αν υπάρχει
+                    const todayBackup = backupData[today];
+                    if (todayBackup && todayBackup.expiresAt > now) {
+                        const hoursLeft = Math.ceil((todayBackup.expiresAt - now) / 3600000);
+                        html += `<div class="history-date-group" style="border:1.5px solid #fcd34d;border-radius:10px;padding:8px;margin-bottom:10px;background:#fffbeb;">
+                            <div class="history-date-label" style="color:#d97706;">💾 Backup ${today} · ${hoursLeft}ώρ. απομένουν</div>`;
+                        const bk = todayBackup.bookings || {};
+                        Object.values(bk).filter(b => b.status && b.status !== 'free').forEach(b => {
+                            html += `<div class="history-item">
+                                <strong>Ομπρέλα ${b.number||''}</strong> · ${b.customer||b.name||'-'} · <span style="color:var(--muted)">${b.status||''}</span>
+                                ${b.time?' · '+b.time:''} ${b.notes?' · '+b.notes:''}
+                            </div>`;
+                        });
+                        html += '</div>';
+                    }
+
+                    dates.forEach(date => {
+                        const bookings = data[date];
+                        const reserved = Object.values(bookings).filter(b => b.status && b.status !== 'free');
+                        if (!reserved.length) return;
+                        html += `<div class="history-date-group">
+                            <div class="history-date-label">${date}</div>`;
+                        reserved.forEach(b => {
+                            html += `<div class="history-item">
+                                <strong>Ομπρέλα ${b.number||''}</strong> · ${b.customer||b.name||'-'} · <span style="color:var(--muted)">${b.status||''}</span>
+                                ${b.time?' · '+b.time:''} ${b.notes?' · '+b.notes:''}
+                            </div>`;
+                        });
+                        html += '</div>';
+                    });
+                    document.getElementById('history-body').innerHTML = html ||
+                        '<p style="color:var(--muted);text-align:center;font-size:12px">Δεν υπάρχει ιστορικό</p>';
+                });
+            });
+        }
+
+        // Αποθήκευση backup ημέρας με TTL 16 ωρών
+        function saveDailyBackup(silent) {
+            const d = document.getElementById('globalDate').value;
+            const snapshot = JSON.parse(JSON.stringify(dailyBookings));
+            const backupEntry = {
+                date: d,
+                bookings: snapshot,
+                savedAt: Date.now(),
+                expiresAt: Date.now() + 16 * 60 * 60 * 1000  // 16 ώρες
+            };
+            database.ref('daily_backup/' + d).set(backupEntry)
+                .then(() => { if (!silent) alert('💾 Backup αποθηκεύτηκε! Θα διαγραφεί αυτόματα σε 16 ώρες.'); })
+                .catch(e => { if (!silent) alert('Σφάλμα backup: ' + e); });
+        }
+
+        // Αυτόματο backup μία φορά την ημέρα (αν δεν υπάρχει ήδη backup για σήμερα)
+        function autoBackupIfNeeded() {
+            const d = document.getElementById('globalDate').value;
+            const today = new Date().toISOString().split('T')[0];
+            if (d !== today) return; // Μόνο για την τρέχουσα ημέρα
+            database.ref('daily_backup/' + d).once('value', snap => {
+                const existing = snap.val();
+                const now = Date.now();
+                // Κάνε backup μόνο αν δεν υπάρχει ήδη έγκυρο (< 16ω)
+                if (!existing || !existing.expiresAt || existing.expiresAt < now) {
+                    saveDailyBackup(true); // silent
+                }
             });
         }
 
@@ -733,7 +824,7 @@
                 btn.style.transform = 'none';
                 btn.style.border = '1.5px solid transparent';
             });
-            const map = { 'free': '.sp-free', 'reserved': '.sp-reserved', 'hotel': '.sp-hotel', 'special': '.sp-special', 'broken': '.sp-broken' };
+            const map = { 'free': '.sp-free', 'reserved': '.sp-reserved', 'hotel': '.sp-hotel', 'special': '.sp-special', 'broken': '.sp-broken', 'together': '.sp-together' };
             const activeBtn = document.querySelector('.status-popup-btns ' + map[status]);
             if (activeBtn) {
                 activeBtn.style.border = '2.5px solid #1e293b';
@@ -797,10 +888,12 @@
             if (!popupCurrentNum) return;
             const currentStatus = (dailyBookings[popupCurrentNum] || {}).status || 'free';
             
-            if (currentStatus === 'reserved' && status !== 'reserved') {
-                requireAdmin(() => {
-                    executeStatusChange(status);
-                });
+            // Admin απαιτείται μόνο για αλλαγή ΑΠΟ reserved ή together → άλλο status
+            const needsAdmin = (currentStatus === 'reserved' && status !== 'reserved')
+                            || (currentStatus === 'together' && status !== 'together');
+
+            if (needsAdmin) {
+                requireAdmin(() => { executeStatusChange(status); });
             } else {
                 executeStatusChange(status);
             }
@@ -820,6 +913,9 @@
                 
                 // Αυτόματος συγχρονισμός βασικών στοιχείων στις συνδεδεμένες ομπρέλες
                 autoSyncLinkedCoreFields();
+                
+                // Αυτόματο κλείσιμο popup μετά από 600ms
+                setTimeout(() => closeStatusPopup(), 600);
             }
         }
 
@@ -850,46 +946,6 @@
                     });
                 }
             });
-        }
-
-        // ── ΧΕΙΡΟΚΙΝΗΤΟΣ ΣΥΓΧΡΟΝΙΣΜΟΣ (Για Σημειώσεις, Έξτρα κλπ) ──
-        function syncLinkedUmbrellas() {
-            if (!popupCurrentNum) return;
-            const linkedValue = document.getElementById('sp-linked').value;
-            if (!linkedValue.trim()) {
-                alert("⚠️ Συμπλήρωσε πρώτα τις συνδεδεμένες ομπρέλες στο πεδίο (π.χ. 102, 103)!");
-                return;
-            }
-            const linkedUmbrellas = linkedValue.split(/[\s,]+/).filter(id => id.trim() !== '');
-            
-            const customer    = document.getElementById('sp-customer').value;
-            const time        = document.getElementById('sp-time').value;
-            const consumption = document.getElementById('sp-consumption').value;
-            const notes       = document.getElementById('sp-notes').value;
-            const notes2      = document.getElementById('sp-notes2').value;
-            
-            const currentBooking = dailyBookings[popupCurrentNum] || {};
-            const status         = currentBooking.status || 'free';
-            const staff          = currentBooking.staff || '';
-
-            const d = document.getElementById('globalDate').value;
-            let count = 0;
-            
-            linkedUmbrellas.forEach(num => {
-                if (masterUmbrellasList[num]) {
-                    database.ref('bookings_by_date/' + d + '/' + num).set({
-                        status: status,
-                        customer: customer,
-                        staff: staff,
-                        time: time,
-                        consumption: consumption,
-                        notes: notes,
-                        notes2: notes2
-                    });
-                    count++;
-                }
-            });
-            alert(`🔗 Επιτυχής Χειροκίνητος Συγχρονισμός! Αντιγράφηκαν όλα τα στοιχεία μαζί με τις Σημειώσεις σε ${count} ομπρέλες.`);
         }
 
         function safeEvalConsumption(val) {
@@ -928,7 +984,7 @@
                 if (!rows[r]) rows[r] = [];
                 rows[r].push(u);
             });
-            const cls = { free:'ov-free', reserved:'ov-reserved', hotel:'ov-hotel', special:'ov-special', broken:'ov-broken' };
+            const cls = { free:'ov-free', reserved:'ov-reserved', hotel:'ov-hotel', special:'ov-special', broken:'ov-broken', together:'ov-together' };
             let html = '';
             Object.keys(rows).sort((a,b)=>a-b).forEach(r => {
                 html += `<div style="margin-bottom:8px;"><div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:3px;">ΣΕΙΡΑ ${r}</div><div style="display:flex;flex-wrap:wrap;gap:2px;">`;
@@ -989,12 +1045,12 @@
         function setStatusFilter(status) {
             activeStatusFilter = status;
             document.querySelectorAll('.stat-badge').forEach(b => b.classList.remove('active'));
-            const map = {all:'badge-all',free:'badge-free',reserved:'badge-reserved',hotel:'badge-hotel',special:'badge-special',broken:'badge-broken'};
+            const map = {all:'badge-all',free:'badge-free',reserved:'badge-reserved',hotel:'badge-hotel',special:'badge-special',broken:'badge-broken',together:'badge-together'};
             if (map[status]) document.getElementById(map[status]).classList.add('active');
             renderDashboard();
         }
 
-        function changeWorkingDate() { startLiveSync(); }
+        function changeWorkingDate() { startLiveSync._backupDone = false; startLiveSync(); }
 
         function startLiveSync() {
             const selectedDate = document.getElementById('globalDate').value;
@@ -1006,12 +1062,20 @@
                     database.ref('master_umbrellas').set(def); return;
                 }
                 database.ref('bookings_by_date/'+selectedDate).on('value', (b) => {
-                    dailyBookings = b.val() || {}; renderDashboard();
+                    dailyBookings = b.val() || {};
+                    renderDashboard();
+                    // Αυτόματο backup μία φορά μετά το πρώτο φόρτωμα της ημέρας
+                    if (!startLiveSync._backupDone) {
+                        startLiveSync._backupDone = true;
+                        setTimeout(autoBackupIfNeeded, 2000);
+                    }
                 });
             });
         }
+        startLiveSync._backupDone = false;
 
-        function addNewCustomUmbrella() {
+        function addNewCustomUmbrella() { requireAdmin(() => _addNewCustomUmbrella()); }
+        function _addNewCustomUmbrella() {
             const num = prompt("Εισάγετε τον αριθμό της νέας ομπρέλας:");
             if (!num) return;
             const n = parseInt(num);
@@ -1089,7 +1153,7 @@
             const wrapper = document.getElementById('zoom-wrapper');
             wrapper.innerHTML = '';
 
-            let total=0, occ=0, hotel=0, spec=0, broken=0, free=0;
+            let total=0, occ=0, hotel=0, spec=0, broken=0, free=0, together=0;
             const sorted = Object.keys(masterUmbrellasList).sort((a,b)=>parseInt(a)-parseInt(b));
 
             sorted.forEach(num => {
@@ -1098,6 +1162,7 @@
                 else if (b.status==='hotel') hotel++;
                 else if (b.status==='special') spec++;
                 else if (b.status==='broken') broken++;
+                else if (b.status==='together') together++;
                 else free++;
                 total++;
             });
@@ -1133,6 +1198,7 @@
                         case 'hotel':    fillColor='#1a6bff'; textColor='#fff';    bgTint='#eff6ff'; break;
                         case 'special':  fillColor='#7c3aed'; textColor='#fff';    bgTint='#f5f3ff'; break;
                         case 'broken':   fillColor='#f59e0b'; textColor='#1e293b'; bgTint='#fffbeb'; break;
+                        case 'together': fillColor='#92400e'; textColor='#fff';    bgTint='#fef3c7'; break;
                         default:         fillColor='#94a3b8'; textColor='#1e293b'; bgTint='#f8fafc';
                     }
 
@@ -1175,6 +1241,7 @@
             document.getElementById('stat-hotel').innerText = hotel;
             document.getElementById('stat-spec').innerText = spec;
             document.getElementById('stat-broken').innerText = broken;
+            document.getElementById('stat-together').innerText = together;
 
             enableDragScroll();
         }
