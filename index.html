@@ -9,7 +9,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#1a6bff">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon.svg">
+    <link class="apple-touch-icon" href="icon.svg">
     <title>Imperial Beach Management</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -122,8 +122,6 @@
         }
         .logo-area span { font-size: 9px; color: var(--muted); letter-spacing: 2px; }
 
-        .header-controls { display: contents; }
-
         .zoom-controls {
             display: flex; align-items: center; gap: 4px;
             background: #f1f5f9; border: 1px solid var(--border);
@@ -146,14 +144,6 @@
         }
         .zoom-label:hover { color: var(--primary); }
 
-        .date-picker-wrapper {
-            display: flex; align-items: center; gap: 5px;
-            background: #f1f5f9; border: 1px solid var(--border);
-            padding: 4px 8px; border-radius: 10px; flex-shrink: 0;
-        }
-        .date-picker-wrapper label { font-size: 10px; font-weight: 600; color: var(--muted); }
-        .date-input { border: none; background: transparent; font-size: 11px; font-weight: 700; outline: none; color: var(--text); cursor: pointer; max-width: 120px; }
-
         .stats-container { display: flex; flex-wrap: nowrap; gap: 3px; flex-shrink: 0; }
         .stat-badge {
             background: #f1f5f9; border: 1px solid var(--border);
@@ -174,48 +164,27 @@
         }
         .search-input:focus { border-color: var(--primary); background: #fff; }
 
-        /* ── TABLET/DESKTOP: single row header ── */
         @media (min-width: 700px) {
-            header {
-                flex-direction: row;
-                align-items: center;
-                padding: 5px 14px;
-                gap: 10px;
-            }
-            .header-row1 {
-                flex: 0 0 auto;
-                width: auto;
-                overflow: visible;
-            }
-            .header-row2 {
-                flex: 1;
-                min-width: 0;
-            }
+            header { flex-direction: row; align-items: center; padding: 5px 14px; gap: 10px; }
+            .header-row1 { flex: 0 0 auto; width: auto; overflow: visible; }
+            .header-row2 { flex: 1; min-width: 0; }
         }
 
         /* ── MAIN ── */
         #main-container { flex: 1; overflow: auto; padding: 12px 16px; min-height: 0; }
-        #zoom-wrapper {
-            transform-origin: top left;
-            width: 100%;
-        }
-        #zoom-outer {
-            overflow: hidden;
-        }
+        #zoom-wrapper { transform-origin: top left; width: 100%; }
+        #zoom-outer { overflow: hidden; }
 
         /* ── ROW ── */
         .beach-row-section { margin-bottom: 18px; }
         .row-label {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 13px; letter-spacing: 3px; color: var(--muted);
-            margin-bottom: 8px; padding-left: 2px;
-            user-select: none;
+            margin-bottom: 8px; padding-left: 2px; user-select: none;
         }
         .row-cards-container {
             display: flex; flex-wrap: nowrap !important; gap: 8px;
-            overflow-x: auto; padding-bottom: 6px;
-            cursor: grab;
-            user-select: none;
+            overflow-x: auto; padding-bottom: 6px; cursor: grab; user-select: none;
         }
         .row-cards-container::-webkit-scrollbar { height: 4px; }
         .row-cards-container::-webkit-scrollbar-track { background: transparent; }
@@ -223,13 +192,9 @@
 
         /* ── UMBRELLA CARD ── */
         .umbrella-card {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 6px 5px 8px;
-            border: 2px solid var(--border);
-            flex: 0 0 110px;
-            display: flex; flex-direction: column; align-items: center;
-            position: relative;
+            background: var(--surface); border-radius: 12px; padding: 6px 5px 8px;
+            border: 2px solid var(--border); flex: 0 0 115px;
+            display: flex; flex-direction: column; align-items: center; position: relative;
             transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
         }
         .umbrella-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
@@ -246,77 +211,24 @@
         }
         .delete-icon:hover { color: var(--danger); }
 
-        /* ── UMBRELLA ICON ── */
-        .icon-box {
-            width: 80px; height: 68px;
-            position: relative; margin: 2px 0 6px;
-        }
+        .icon-box { width: 80px; height: 68px; position: relative; margin: 2px 0 6px; }
         .umbrella-svg { width: 100%; height: 100%; }
 
         .umb-number-badge {
-            position: absolute;
-            top: 13px; left: 50%;
-            transform: translateX(-50%);
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 26px; letter-spacing: 1px;
-            z-index: 2; white-space: nowrap;
-            line-height: 1;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            position: absolute; top: 13px; left: 50%; transform: translateX(-50%);
+            font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1px;
+            z-index: 2; white-space: nowrap; line-height: 1; text-shadow: 0 1px 4px rgba(0,0,0,0.3);
         }
 
-        .inputs-form { width: 90%; display: flex; flex-direction: column; gap: 3px; margin: 4px auto 0; }
+        .inputs-form { width: 92%; display: flex; flex-direction: column; gap: 3px; margin: 4px auto 0; }
         
         .input-field, .card-inline-field {
-            width: 100%; border: none;
-            border-bottom: 1px solid #e2e8f0;
-            background: transparent; padding: 3px 2px;
-            font-size: 10px; font-weight: 500; outline: none;
-            text-align: center; color: var(--text);
-            font-family: 'DM Sans', sans-serif; transition: border-color 0.2s;
+            width: 100%; border: none; border-bottom: 1px solid #e2e8f0;
+            background: transparent; padding: 3px 2px; font-size: 10px; font-weight: 500; outline: none;
+            text-align: center; color: var(--text); font-family: 'DM Sans', sans-serif; transition: border-color 0.2s;
         }
         .input-field::placeholder, .card-inline-field::placeholder { color: #cbd5e1; }
         .input-field:focus, .card-inline-field:focus { border-bottom-color: var(--primary); }
-
-        .status-row {
-            display: flex; flex-direction: column;
-            width: 100%; gap: 2px;
-            margin-top: 4px; border-top: 1px solid #f1f5f9;
-            padding-top: 4px;
-        }
-        .status-row-inner { display: flex; gap: 2px; width: 100%; }
-        .status-dot-btn {
-            flex: 1;
-            border: 1px solid #e2e8f0; padding: 3px 0; border-radius: 5px;
-            cursor: pointer; font-size: 7.5px; font-weight: 700;
-            text-align: center; background: #f8fafc; color: #94a3b8;
-            transition: all 0.15s; font-family: 'DM Sans', sans-serif;
-            line-height: 1; white-space: nowrap;
-        }
-        .status-dot-btn:active { transform: scale(0.93); }
-        .status-dot-btn.free-btn.active   { background: #dcfce7; color: #16a34a;        border-color: #16a34a; }
-        .status-dot-btn.res-btn.active    { background: #fee2e2; color: var(--danger);  border-color: var(--danger); }
-        .status-dot-btn.hotel-btn.active  { background: #dbeafe; color: var(--primary); border-color: var(--primary); }
-        .status-dot-btn.spec-btn.active   { background: #ede9fe; color: var(--purple);  border-color: var(--purple); }
-        .status-dot-btn.broken-btn.active { background: #fef3c7; color: #d97706;        border-color: #d97706; }
-
-        /* ── HEADER ACTION BUTTONS ── */
-        .header-action-btns { display: flex; align-items: center; gap: 4px; }
-        .hdr-btn {
-            padding: 5px 8px; border: none; border-radius: 8px;
-            font-size: 12px; font-weight: 700; cursor: pointer;
-            font-family: 'DM Sans', sans-serif; transition: all 0.15s;
-            white-space: nowrap; min-width: 32px; text-align: center;
-        }
-        .hdr-btn.primary { background: var(--primary); color: white; }
-        .hdr-btn.primary:hover { background: #1558d6; }
-        .hdr-btn.secondary { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
-        .hdr-btn.secondary:hover { background: #e2e8f0; }
-        .hdr-btn.danger-clear { background: #fee2e2; color: var(--danger); border: 1px solid #fecaca; font-size: 13px; }
-        .hdr-btn.danger-clear:hover { background: #fecaca; }
-        .hdr-btn.overview-btn { background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; }
-        .hdr-btn.overview-btn.active { background: var(--primary); color: #fff; }
-        .hdr-btn.recovery-btn { background: #fef3c7; color: #d97706; border: 1px solid #fcd34d; }
-        .hdr-btn.history-btn  { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
 
         /* ── SIDE PANELS ── */
         .side-panel {
@@ -326,123 +238,73 @@
         }
         .side-panel.open { display: flex; }
         .side-panel-card {
-            background: #fff; border-radius: 18px;
-            width: 100%; max-width: 420px; max-height: 80vh;
-            display: flex; flex-direction: column;
-            animation: slideUp 0.2s cubic-bezier(0.34,1.3,0.64,1);
+            background: #fff; border-radius: 18px; width: 100%; max-width: 420px; max-height: 80vh;
+            display: flex; flex-direction: column; animation: slideUp 0.2s cubic-bezier(0.34,1.3,0.64,1);
         }
         .side-panel-header {
             padding: 14px 16px; border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-            flex-shrink: 0;
+            display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
         }
         .side-panel-header h3 { margin: 0; font-size: 14px; font-weight: 800; }
         .side-panel-header button {
-            background: #f1f5f9; border: none; border-radius: 8px;
-            padding: 5px 10px; font-size: 12px; font-weight: 700;
-            cursor: pointer; font-family: 'DM Sans', sans-serif;
+            background: #f1f5f9; border: none; border-radius: 8px; padding: 5px 10px; font-size: 12px;
+            font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif;
         }
         .side-panel-body { padding: 12px; overflow-y: auto; flex: 1; }
-        .recovery-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 12px; border-radius: 10px; background: #f8fafc;
-            border: 1px solid var(--border); margin-bottom: 6px;
-        }
-        .recovery-item-info { font-size: 12px; }
-        .recovery-item-info strong { display: block; font-size: 13px; }
-        .recovery-item-info span { color: var(--muted); font-size: 11px; }
-        .recovery-restore-btn {
-            background: #fef3c7; color: #d97706; border: 1px solid #fcd34d;
-            border-radius: 8px; padding: 5px 10px; font-size: 11px; font-weight: 700;
-            cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap;
-        }
-        .history-date-group { margin-bottom: 10px; }
-        .history-date-label {
-            font-size: 10px; font-weight: 700; color: var(--muted);
-            letter-spacing: 1px; margin-bottom: 4px;
-        }
-        .history-item {
-            padding: 8px 10px; border-radius: 8px; background: #f8fafc;
-            border: 1px solid var(--border); margin-bottom: 4px;
-            font-size: 11px;
-        }
-        .history-item strong { color: var(--primary); }
-
+        
         /* ── OVERVIEW PANEL ── */
         #overview-panel {
-            display: none; position: fixed; inset: 0;
-            background: var(--bg); z-index: 200; overflow: auto; padding: 10px;
+            display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow: auto; padding: 10px;
         }
         #overview-panel.open { display: block; }
         .overview-topbar {
-            position: sticky; top: 0; background: var(--surface);
-            border-radius: 10px; padding: 8px 12px; margin-bottom: 8px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08); z-index: 10;
+            position: sticky; top: 0; background: var(--surface); border-radius: 10px; padding: 8px 12px; margin-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); z-index: 10;
         }
         .overview-topbar h3 { margin: 0; font-size: 13px; font-weight: 700; }
         .overview-topbar button {
-            background: var(--danger); color: #fff; border: none;
-            border-radius: 7px; padding: 5px 12px; font-size: 12px;
-            font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif;
+            background: var(--danger); color: #fff; border: none; border-radius: 7px; padding: 5px 12px;
+            font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif;
         }
-        .ov-row { margin-bottom: 8px; }
-        .ov-row-label { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: 1px; margin-bottom: 3px; }
-        .ov-cells { display: flex; flex-wrap: wrap; gap: 2px; }
-        .ov-cell {
-            width: 34px; height: 34px; border-radius: 5px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 8px; font-weight: 800; cursor: pointer;
-            border: 1px solid transparent; transition: transform 0.1s; text-align: center;
+        
+        /* ── HEADER ACTION BUTTONS ── */
+        .header-action-btns { display: flex; align-items: center; gap: 4px; }
+        .hdr-btn {
+            padding: 5px 8px; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+            font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap; min-width: 32px; text-align: center;
         }
-        .ov-cell:active { transform: scale(0.9); }
-        .ov-free     { background: #f0fdf4; border-color: #86efac; color: #16a34a; }
-        .ov-reserved { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
-        .ov-hotel    { background: #eff6ff; border-color: #93c5fd; color: #1d6fe8; }
-        .ov-special  { background: #faf5ff; border-color: #c4b5fd; color: #7c3aed; }
-        .ov-broken   { background: #fffbeb; border-color: #fcd34d; color: #d97706; }
-        .ov-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-        .ov-legend-item { display: flex; align-items: center; gap: 3px; font-size: 9px; font-weight: 600; color: var(--muted); }
-        .ov-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+        .hdr-btn.primary { background: var(--primary); color: white; }
+        .hdr-btn.secondary { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
+        .hdr-btn.danger-clear { background: #fee2e2; color: var(--danger); border: 1px solid #fecaca; font-size: 13px; }
+        .hdr-btn.overview-btn { background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; }
+        .hdr-btn.overview-btn.active { background: var(--primary); color: #fff; }
+        .hdr-btn.recovery-btn { background: #fef3c7; color: #d97706; border: 1px solid #fcd34d; }
+        .hdr-btn.history-btn  { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
 
         .staff-btn {
             padding: 7px 12px; border: 1.5px solid #e2e8f0; border-radius: 20px;
             background: #f8fafc; color: var(--text); font-size: 12px; font-weight: 700;
-            cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s;
-            white-space: nowrap;
+            cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap;
         }
-        .staff-btn:active { transform: scale(0.95); }
         .staff-btn.selected { background: #dbeafe; color: #1d6fe8; border-color: #93c5fd; }
 
         /* ── STATUS POPUP ── */
         #status-popup {
-            display: none; position: fixed; inset: 0;
-            background: rgba(15,23,42,0.5); backdrop-filter: blur(4px);
-            z-index: 500; align-items: center; justify-content: center;
-            overflow-y: auto; padding: 16px;
+            display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(4px);
+            z-index: 500; align-items: center; justify-content: center; overflow-y: auto; padding: 16px;
         }
         #status-popup.open { display: flex; }
         .status-popup-card {
-            background: #fff; border-radius: 18px;
-            padding: 16px 16px 20px;
-            width: 100%; max-width: 400px;
-            animation: slideUp 0.2s cubic-bezier(0.34,1.3,0.64,1);
-            max-height: 90vh; overflow-y: auto;
+            background: #fff; border-radius: 18px; padding: 16px 16px 20px; width: 100%; max-width: 400px;
+            animation: slideUp 0.2s cubic-bezier(0.34,1.3,0.64,1); max-height: 90vh; overflow-y: auto;
         }
         @keyframes slideUp { from { transform: scale(0.9); opacity:0; } to { transform: scale(1); opacity:1; } }
-        .status-popup-title {
-            font-size: 15px; font-weight: 800; text-align: center;
-            margin-bottom: 10px; color: var(--text);
-        }
-        .status-popup-btns {
-            display: grid; grid-template-columns: 1fr 1fr 1fr;
-            gap: 6px; margin-top: 10px;
-        }
+        .status-popup-title { font-size: 15px; font-weight: 800; text-align: center; margin-bottom: 10px; color: var(--text); }
+        .status-popup-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 10px; }
+        
         .sp-btn {
-            padding: 10px 4px; border: 1.5px solid transparent;
-            border-radius: 10px; font-size: 11px; font-weight: 700;
-            cursor: pointer; font-family: 'DM Sans', sans-serif;
-            transition: all 0.15s; text-align: center; line-height: 1.3;
+            padding: 10px 4px; border: 1.5px solid transparent; border-radius: 10px; font-size: 11px; font-weight: 700;
+            cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; text-align: center; line-height: 1.3;
         }
         .sp-btn:active { transform: scale(0.95); }
         .sp-free     { background: #dcfce7; color: #16a34a; border-color: #86efac; }
@@ -450,21 +312,14 @@
         .sp-hotel    { background: #dbeafe; color: #1d6fe8; border-color: #93c5fd; }
         .sp-special  { background: #ede9fe; color: #7c3aed; border-color: #c4b5fd; }
         .sp-broken   { background: #fef3c7; color: #d97706; border-color: #fcd34d; }
-        .sp-close    { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; grid-column: 1/-1; }
+        .sp-close    { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; grid-column: 1/-1; font-weight: bold; font-size: 13px; margin-top: 5px; }
 
         /* ── CONFIRM MODAL ── */
-        #confirm-modal {
-            display: none; position: fixed; inset: 0;
-            background: rgba(15,23,42,0.55); backdrop-filter: blur(4px);
-            z-index: 900; align-items: center; justify-content: center;
-        }
+        #confirm-modal { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55); backdrop-filter: blur(4px); z-index: 900; align-items: center; justify-content: center; }
         #confirm-modal.open { display: flex; }
         .confirm-card {
-            background: #fff; border-radius: 20px;
-            padding: 32px 28px 24px;
-            max-width: 320px; width: 90%;
-            box-shadow: 0 24px 60px rgba(0,0,0,0.3);
-            display: flex; flex-direction: column; align-items: center; gap: 12px;
+            background: #fff; border-radius: 20px; padding: 32px 28px 24px; max-width: 320px; width: 90%;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; gap: 12px;
             animation: popIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
         }
         @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -472,10 +327,8 @@
         .confirm-title { font-size: 17px; font-weight: 700; color: var(--text); text-align: center; margin: 0; }
         .confirm-sub { font-size: 13px; color: var(--muted); text-align: center; margin: 0; }
         .confirm-btns { display: flex; gap: 10px; width: 100%; margin-top: 8px; }
-        .confirm-cancel { background: #f1f5f9; color: var(--muted); }
-        .confirm-cancel:hover { background: #e2e8f0; }
-        .confirm-ok { background: var(--danger); color: #fff; }
-        .confirm-ok:hover { background: #c81a2e; }
+        .confirm-cancel { background: #f1f5f9; color: var(--muted); width:50%; padding:10px; border-radius:10px; border:none; font-weight:700; cursor:pointer;}
+        .confirm-ok { background: var(--danger); color: #fff; width:50%; padding:10px; border-radius:10px; border:none; font-weight:700; cursor:pointer;}
     </style>
 </head>
 <body>
@@ -498,17 +351,16 @@
                 <input id="sp-customer" type="text" placeholder="Όνομα πελάτη" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('customer',this.value)">
                 <input id="sp-time" type="text" placeholder="Ώρα" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('time',this.value)">
                 
-                <!-- ΥΠΟΛΟΓΙΣΤΗΣ ΚΑΤΑΝΑΛΩΣΗΣ ΣΤΟ POPUP -->
                 <div style="position:relative; width:100%;">
-                    <input id="sp-consumption" type="text" placeholder="Κατανάλωση (€) π.χ. 10+5+20" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;padding-right:75px;" oninput="updatePopupField('consumption',this.value); updatePopupConsumptionTotal(this.value);">
+                    <input id="sp-consumption" type="text" placeholder="Καπανάλωση (€) π.χ. 10+5+20" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;padding-right:75px;" oninput="updatePopupField('consumption',this.value); updatePopupConsumptionTotal(this.value);">
                     <span id="sp-consumption-total" style="position:absolute; right:12px; top:11px; font-size:13px; font-weight:700; color:var(--success); pointer-events:none;"></span>
                 </div>
 
                 <input id="sp-notes" type="text" placeholder="Σημειώσεις" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('notes',this.value)">
                 <input id="sp-notes2" type="text" placeholder="Extra σημειώσεις" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('notes2',this.value)">
                 
-                <!-- ΠΕΔΙΟ ΣΥΝΔΕΣΗΣ ΠΟΛΛΑΠΛΩΝ ΟΜΠΡΕΛΩΝ -->
                 <input id="sp-linked" type="text" placeholder="🔗 Συνδεδεμένες ομπρέλες (π.χ. 102, 103)" style="padding:9px 12px;border:1.5px solid #bfdbfe;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;background:#f0f7ff;">
+                <button type="button" onclick="syncLinkedUmbrellas()" style="padding:11px; background:#1e293b; color:white; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.1)">🔗 Χειροκίνητος Συγχρονισμός Σημειώσεων</button>
             </div>
             <div class="status-popup-btns">
                 <button class="sp-btn sp-free"     onclick="setStatusFromPopup('free')">✅<br>Διαθ.</button>
@@ -516,7 +368,19 @@
                 <button class="sp-btn sp-hotel"    onclick="setStatusFromPopup('hotel')">🏨<br>Ξεν.</button>
                 <button class="sp-btn sp-special"  onclick="setStatusFromPopup('special')">⭐<br>Special</button>
                 <button class="sp-btn sp-broken"   onclick="setStatusFromPopup('broken')">🔧<br>Χαλ.</button>
-                <button class="sp-btn sp-close"    onclick="closeStatusPopup()">✕ Κλείσιμο</button>
+                <button class="sp-btn sp-close"    onclick="closeStatusPopup()">✕ Κλείσιμο Παραθύρου</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN PIN MODAL -->
+    <div id="admin-pin-modal" class="side-panel" style="z-index:999;" onclick="if(event.target===this)closeAdminModal()">
+        <div class="side-panel-card" style="max-width:320px; padding:24px; align-items:center; gap:16px;">
+            <h3 style="margin:0; font-family:'DM Sans',sans-serif; font-size:16px;">🔐 Κωδικός Διαχειριστή</h3>
+            <input type="password" id="admin-pin-input" placeholder="Εισάγετε PIN" style="padding:12px; text-align:center; font-size:20px; font-weight:700; width:100%; border:1.5px solid var(--border); border-radius:12px; outline:none; letter-spacing:4px;">
+            <div style="display:flex; gap:10px; width:100%; margin-top:4px;">
+                <button class="hdr-btn secondary" style="flex:1; padding:10px; border-radius:10px;" onclick="closeAdminModal()">Ακύρωση</button>
+                <button class="hdr-btn primary" style="flex:1; padding:10px; border-radius:10px;" onclick="submitAdminPin()">OK</button>
             </div>
         </div>
     </div>
@@ -525,7 +389,7 @@
     <div id="recovery-panel" class="side-panel" onclick="if(event.target===this)toggleRecovery()">
         <div class="side-panel-card">
             <div class="side-panel-header">
-                <h3>↩ Ανεύρεση (24ώρες)</h3>
+                <h3>¾ Ανεύρεση (24ώρες)</h3>
                 <button onclick="toggleRecovery()">✕</button>
             </div>
             <div class="side-panel-body" id="recovery-body">
@@ -602,6 +466,7 @@
                 <button class="zoom-btn" onclick="applyZoom(0.1)">+</button>
             </div>
             <div class="header-action-btns">
+                <button class="hdr-btn" id="admin-status-btn" onclick="handleAdminStatusClick()" title="Κατάσταση Κλειδώματος Admin">🔒 Admin</button>
                 <button class="hdr-btn secondary" onclick="addNewCustomUmbrella()" title="Νέα ομπρέλα">+</button>
                 <button class="hdr-btn recovery-btn" onclick="toggleRecovery()" title="Ανεύρεση">↩</button>
                 <button class="hdr-btn history-btn" onclick="toggleHistory()" title="Ιστορικό">📋</button>
@@ -707,20 +572,67 @@
         let overviewOpen = false;
         let recoveryOpen = false;
         let historyOpen = false;
+        
+        // ── ADMIN MODAL LOGIC ──
         const ADMIN_PIN = '0852';
-        let adminUnlocked = false;
-        let adminTimer = null;
+        let adminCallback = null;
+
+        function updateAdminButtonUI() {
+            const btn = document.getElementById('admin-status-btn');
+            if (!btn) return;
+            const isAuthed = localStorage.getItem('admin_authed') === 'true';
+            if (isAuthed) {
+                btn.textContent = '🔓 Admin';
+                btn.style.background = '#dcfce7';
+                btn.style.color = '#15803d';
+                btn.style.borderColor = '#bbf7d0';
+            } else {
+                btn.textContent = '🔒 Admin';
+                btn.style.background = '#fee2e2';
+                btn.style.color = '#b91c1c';
+                btn.style.borderColor = '#fecaca';
+            }
+        }
+
+        function handleAdminStatusClick() {
+            document.getElementById('admin-pin-input').value = '';
+            document.getElementById('admin-pin-modal').classList.add('open');
+            
+            adminCallback = function() {
+                const isAuthed = localStorage.getItem('admin_authed') === 'true';
+                if (isAuthed) {
+                    localStorage.removeItem('admin_authed');
+                    alert('🔒 Ο Admin κλείδωσε με επιτυχία!');
+                } else {
+                    localStorage.setItem('admin_authed', 'true');
+                    alert('🔓 Ο Admin ξεκλειδώσε με επιτυχία!');
+                }
+                updateAdminButtonUI();
+            };
+        }
 
         function requireAdmin(callback) {
-            if (adminUnlocked) { callback(); return; }
-            const pin = prompt('🔐 Κωδικός Admin:');
+            if (localStorage.getItem('admin_authed') === 'true') {
+                if (callback) callback();
+                return;
+            }
+            adminCallback = callback;
+            document.getElementById('admin-pin-input').value = '';
+            document.getElementById('admin-pin-modal').classList.add('open');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-pin-modal').classList.remove('open');
+            adminCallback = null;
+        }
+
+        function submitAdminPin() {
+            const pin = document.getElementById('admin-pin-input').value;
             if (pin === ADMIN_PIN) {
-                adminUnlocked = true;
-                clearTimeout(adminTimer);
-                adminTimer = setTimeout(() => { adminUnlocked = false; }, 5 * 60 * 1000);
-                callback();
-            } else if (pin !== null) {
-                alert('❌ Λάθος κωδικός!');
+                if (adminCallback) adminCallback();
+                closeAdminModal();
+            } else {
+                alert('❌ Λάθος κωδικός Admin!');
             }
         }
 
@@ -814,10 +726,29 @@
 
         let popupCurrentNum = null;
 
+        function updatePopupStatusButtonsHighlight(status) {
+            const btns = document.querySelectorAll('.status-popup-btns .sp-btn');
+            btns.forEach(btn => {
+                btn.style.boxShadow = 'none';
+                btn.style.transform = 'none';
+                btn.style.border = '1.5px solid transparent';
+            });
+            const map = { 'free': '.sp-free', 'reserved': '.sp-reserved', 'hotel': '.sp-hotel', 'special': '.sp-special', 'broken': '.sp-broken' };
+            const activeBtn = document.querySelector('.status-popup-btns ' + map[status]);
+            if (activeBtn) {
+                activeBtn.style.border = '2.5px solid #1e293b';
+                activeBtn.style.transform = 'scale(1.04)';
+                activeBtn.style.boxShadow = '0 4px 10px rgba(0,0,0,0.15)';
+            }
+        }
+
         function openStatusPopup(num) {
             popupCurrentNum = num;
             document.getElementById('status-popup-title').textContent = 'Ομπρέλα ' + num;
             const b = (dailyBookings || {})[num] || {};
+            
+            updatePopupStatusButtonsHighlight(b.status || 'free');
+            
             document.getElementById('sp-staff-display').textContent = b.staff ? '✓ ' + b.staff : '';
             document.querySelectorAll('.staff-btn').forEach(btn => {
                 btn.classList.toggle('selected', btn.textContent === b.staff);
@@ -828,13 +759,11 @@
             updatePopupConsumptionTotal(b.consumption || '');
             document.getElementById('sp-notes').value       = b.notes       || '';
             document.getElementById('sp-notes2').value      = b.notes2      || '';
-            
-            document.getElementById('sp-linked').value     = '';
+            document.getElementById('sp-linked').value      = '';
             
             document.getElementById('status-popup').classList.add('open');
         }
 
-        // ΑΛΛΑΓΗ 1: ΕΠΙΛΟΓΗ & ΑΦΑΙΡΕΣΗ ΥΠΑΛΛΗΛΟΥ ΜΕ ΔΕΥΤΕΡΟ ΚΛΙΚ
         function selectStaff(name) {
             if (!popupCurrentNum) return;
             const currentStaff = (dailyBookings[popupCurrentNum] || {}).staff || '';
@@ -845,13 +774,21 @@
             document.querySelectorAll('.staff-btn').forEach(btn => {
                 btn.classList.toggle('selected', btn.textContent === newName);
             });
+            
+            // Auto sync core changes straight away
+            autoSyncLinkedCoreFields();
         }
 
         function updatePopupField(field, value) {
             if (!popupCurrentNum) return;
             updateField(popupCurrentNum, field, value);
         }
+        
         function closeStatusPopup() {
+            if (popupCurrentNum) {
+                // Αυτόματος συγχρονισμός βασικών στοιχείων πριν κλείσει εντελώς το popup
+                autoSyncLinkedCoreFields();
+            }
             document.getElementById('status-popup').classList.remove('open');
             popupCurrentNum = null;
         }
@@ -860,7 +797,6 @@
             if (!popupCurrentNum) return;
             const currentStatus = (dailyBookings[popupCurrentNum] || {}).status || 'free';
             
-            // Έλεγχος Admin αν πάμε να αλλάξουμε μια ήδη Κρατημένη ομπρέλα
             if (currentStatus === 'reserved' && status !== 'reserved') {
                 requireAdmin(() => {
                     executeStatusChange(status);
@@ -870,54 +806,92 @@
             }
         }
 
-        // ΑΛΛΑΓΗ 2: ΟΤΑΝ ΓΙΝΕΤΑΙ ΔΙΑΘΕΣΙΜΗ, ΣΒΗΝΟΝΤΑΙ ΟΛΑ ΜΟΝΟ ΣΤΗ ΣΥΓΚΕΚΡΙΜΕΝΗ ΟΜΠΡΕΛΑ
         function executeStatusChange(status) {
             const d = document.getElementById('globalDate').value;
             
             if (status === 'free') {
                 database.ref('bookings_by_date/' + d + '/' + popupCurrentNum).set({
-                    status: 'free',
-                    customer: '',
-                    staff: '',
-                    time: '',
-                    consumption: '',
-                    notes: '',
-                    notes2: ''
+                    status: 'free', customer: '', staff: '', time: '', consumption: '', notes: '', notes2: ''
                 });
+                closeStatusPopup();
             } else {
                 setStatus(popupCurrentNum, status);
-            }
-            
-            const linkedValue = document.getElementById('sp-linked').value;
-            if (linkedValue.trim() !== '') {
-                const linkedUmbrellas = linkedValue.split(/[\s,]+/).filter(id => id.trim() !== '');
+                updatePopupStatusButtonsHighlight(status);
                 
-                const customer = status === 'free' ? '' : document.getElementById('sp-customer').value;
-                const time = status === 'free' ? '' : document.getElementById('sp-time').value;
-                const consumption = status === 'free' ? '' : document.getElementById('sp-consumption').value;
-                const notes = status === 'free' ? '' : document.getElementById('sp-notes').value;
-                const notes2 = status === 'free' ? '' : document.getElementById('sp-notes2').value;
-                const staff = status === 'free' ? '' : ((dailyBookings[popupCurrentNum] || {}).staff || '');
-
-                linkedUmbrellas.forEach(num => {
-                    if (masterUmbrellasList[num]) {
-                        database.ref('bookings_by_date/' + d + '/' + num).set({
-                            status: status,
-                            customer: customer,
-                            staff: staff,
-                            time: time,
-                            consumption: consumption,
-                            notes: notes,
-                            notes2: notes2
-                        });
-                    }
-                });
+                // Αυτόματος συγχρονισμός βασικών στοιχείων στις συνδεδεμένες ομπρέλες
+                autoSyncLinkedCoreFields();
             }
-            
-            closeStatusPopup();
         }
 
-        // ΑΛΛΑΓΗ 3: ΣΥΝΑΡΤΗΣΕΙΣ ΥΠΟΛΟΓΙΣΤΗ (CALCULATOR) ΓΙΑ ΤΗΝ ΚΑΤΑΝΑΛΩΣΗ
+        // ── ΑΥΤΟΜΑΤΟΣ ΣΥΓΧΡΟΝΙΣΜΟΣ (Πελάτης, Υπάλληλος, Κατάσταση, Ποσό) ──
+        function autoSyncLinkedCoreFields() {
+            if (!popupCurrentNum) return;
+            const linkedValue = document.getElementById('sp-linked').value;
+            if (!linkedValue.trim()) return; // Αν δεν έχει γράψει νούμερα, σταματάει εδώ
+            
+            const linkedUmbrellas = linkedValue.split(/[\s,]+/).filter(id => id.trim() !== '');
+            const d = document.getElementById('globalDate').value;
+            
+            const customer    = document.getElementById('sp-customer').value;
+            const time        = document.getElementById('sp-time').value;
+            const consumption = document.getElementById('sp-consumption').value;
+            const currentBooking = dailyBookings[popupCurrentNum] || {};
+            const status         = currentBooking.status || 'free';
+            const staff          = currentBooking.staff || '';
+
+            linkedUmbrellas.forEach(num => {
+                if (masterUmbrellasList[num]) {
+                    database.ref('bookings_by_date/' + d + '/' + num).update({
+                        status: status,
+                        customer: customer,
+                        staff: staff,
+                        consumption: consumption,
+                        time: time
+                    });
+                }
+            });
+        }
+
+        // ── ΧΕΙΡΟΚΙΝΗΤΟΣ ΣΥΓΧΡΟΝΙΣΜΟΣ (Για Σημειώσεις, Έξτρα κλπ) ──
+        function syncLinkedUmbrellas() {
+            if (!popupCurrentNum) return;
+            const linkedValue = document.getElementById('sp-linked').value;
+            if (!linkedValue.trim()) {
+                alert("⚠️ Συμπλήρωσε πρώτα τις συνδεδεμένες ομπρέλες στο πεδίο (π.χ. 102, 103)!");
+                return;
+            }
+            const linkedUmbrellas = linkedValue.split(/[\s,]+/).filter(id => id.trim() !== '');
+            
+            const customer    = document.getElementById('sp-customer').value;
+            const time        = document.getElementById('sp-time').value;
+            const consumption = document.getElementById('sp-consumption').value;
+            const notes       = document.getElementById('sp-notes').value;
+            const notes2      = document.getElementById('sp-notes2').value;
+            
+            const currentBooking = dailyBookings[popupCurrentNum] || {};
+            const status         = currentBooking.status || 'free';
+            const staff          = currentBooking.staff || '';
+
+            const d = document.getElementById('globalDate').value;
+            let count = 0;
+            
+            linkedUmbrellas.forEach(num => {
+                if (masterUmbrellasList[num]) {
+                    database.ref('bookings_by_date/' + d + '/' + num).set({
+                        status: status,
+                        customer: customer,
+                        staff: staff,
+                        time: time,
+                        consumption: consumption,
+                        notes: notes,
+                        notes2: notes2
+                    });
+                    count++;
+                }
+            });
+            alert(`🔗 Επιτυχής Χειροκίνητος Συγχρονισμός! Αντιγράφηκαν όλα τα στοιχεία μαζί με τις Σημειώσεις σε ${count} ομπρέλες.`);
+        }
+
         function safeEvalConsumption(val) {
             if (!val) return 0;
             let sanitized = val.toString().replace(/[^0-9+\-*/().\s]/g, '');
@@ -925,9 +899,7 @@
             try {
                 let res = new Function('return ' + sanitized)();
                 return (typeof res === 'number' && !isNaN(res)) ? Number(res.toFixed(2)) : 0;
-            } catch(e) {
-                return 0;
-            }
+            } catch(e) { return 0; }
         }
 
         function updatePopupConsumptionTotal(val) {
@@ -959,12 +931,12 @@
             const cls = { free:'ov-free', reserved:'ov-reserved', hotel:'ov-hotel', special:'ov-special', broken:'ov-broken' };
             let html = '';
             Object.keys(rows).sort((a,b)=>a-b).forEach(r => {
-                html += `<div class="ov-row"><div class="ov-row-label">ΣΕΙΡΑ ${r}</div><div class="ov-cells">`;
+                html += `<div style="margin-bottom:8px;"><div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:3px;">ΣΕΙΡΑ ${r}</div><div style="display:flex;flex-wrap:wrap;gap:2px;">`;
                 rows[r].forEach(u => {
                     const b = bk[u.number] || {};
                     const st = b.status || 'free';
                     const lbl = b.name ? b.name.substring(0,5) : u.number;
-                    html += `<div class="ov-cell ${cls[st]||'ov-free'}" onclick="toggleOverview()">${lbl}</div>`;
+                    html += `<div class="ov-cell ${cls[st]||'ov-free'}" style="width:34px;height:34px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;cursor:pointer;border:1px solid transparent;text-align:center;" onclick="toggleOverview()">${lbl}</div>`;
                 });
                 html += `</div></div>`;
             });
@@ -976,8 +948,15 @@
         let activeStatusFilter = 'all';
 
         window.onload = function() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker Registered!', reg))
+                    .catch(err => console.log('Service Worker Registration Failed', err));
+            }
+
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('globalDate').value = today;
+            updateAdminButtonUI();
             startLiveSync();
             setInterval(() => {
                 database.ref('recovery').once('value', snap => {
@@ -1090,33 +1069,17 @@
         function enableDragScroll() {
             const containers = document.querySelectorAll('.row-cards-container');
             containers.forEach(container => {
-                let isDown = false;
-                let startX;
-                let scrollLeft;
-
+                let isDown = false; let startX; let scrollLeft;
                 container.addEventListener('mousedown', (e) => {
                     if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
-                    isDown = true;
-                    container.style.cursor = 'grabbing';
-                    startX = e.pageX - container.offsetLeft;
-                    scrollLeft = container.scrollLeft;
+                    isDown = true; container.style.cursor = 'grabbing';
+                    startX = e.pageX - container.offsetLeft; scrollLeft = container.scrollLeft;
                 });
-
-                container.addEventListener('mouseleave', () => {
-                    isDown = false;
-                    container.style.cursor = 'grab';
-                });
-
-                container.addEventListener('mouseup', () => {
-                    isDown = false;
-                    container.style.cursor = 'grab';
-                });
-
+                container.addEventListener('mouseleave', () => { isDown = false; container.style.cursor = 'grab'; });
+                container.addEventListener('mouseup', () => { isDown = false; container.style.cursor = 'grab'; });
                 container.addEventListener('mousemove', (e) => {
-                    if (!isDown) return;
-                    e.preventDefault();
-                    const x = e.pageX - container.offsetLeft;
-                    const walk = (x - startX) * 1.5;
+                    if (!isDown) return; e.preventDefault();
+                    const x = e.pageX - container.offsetLeft; const walk = (x - startX) * 1.5;
                     container.scrollLeft = scrollLeft - walk;
                 });
             });
@@ -1180,7 +1143,6 @@
                     card.setAttribute('data-name', (b.customer||'').toLowerCase());
                     card.style.background = bgTint;
 
-                    // ΑΛΛΑΓΗ ΣΤΟ CARD INPUT: type="text" για να δέχεται πράξεις και tooltip με το Σύνολο
                     card.innerHTML = `
                         <button class="delete-icon" onclick="deleteUmbrella('${num}')">&times;</button>
                         <div class="icon-box" onclick="openStatusPopup(${num})" style="cursor:pointer">
@@ -1194,6 +1156,7 @@
                             </svg>
                         </div>
                         <div class="inputs-form">
+                            <input class="card-inline-field card-customer-field" placeholder="Πελάτης" value="${b.customer||''}" onchange="updateField('${num}','customer',this.value)" onclick="event.stopPropagation()" style="font-weight:700; border-bottom: 1px dashed #cbd5e1;">
                             <input class="card-inline-field card-staff-field" placeholder="Υπαλ." value="${b.staff||''}" onchange="updateField('${num}','staff',this.value)" onclick="event.stopPropagation()">
                             <input class="card-inline-field card-consumption-field" placeholder="€" type="text" value="${b.consumption||''}" onchange="updateField('${num}','consumption',this.value)" onclick="event.stopPropagation()" title="Σύνολο: ${safeEvalConsumption(b.consumption)}€">
                             <input class="card-inline-field card-notes-field" placeholder="Σημ." value="${b.notes||''}" onchange="updateField('${num}','notes',this.value)" onclick="event.stopPropagation()">
@@ -1216,6 +1179,7 @@
             enableDragScroll();
         }
 
+        // ── FIREBASE FIELD UPDATE ──
         function updateField(num, field, val) {
             database.ref('bookings_by_date/'+document.getElementById('globalDate').value+'/'+num).update({[field]:val});
         }
@@ -1228,15 +1192,6 @@
                 const n = c.getAttribute('data-number'), nm = c.getAttribute('data-name');
                 c.style.display = (!q || n.includes(q) || nm.includes(q)) ? 'flex' : 'none';
             });
-        }
-        function exportPDF() {
-            const d = document.getElementById('globalDate').value;
-            html2pdf().set({
-                margin:10, filename:'imperial_beach_'+d+'.pdf',
-                image:{type:'jpeg',quality:0.98},
-                html2canvas:{scale:2,useCORS:true},
-                jsPDF:{unit:'mm',format:'a4',orientation:'landscape'}
-            }).from(document.getElementById('zoom-wrapper')).save();
         }
     </script>
 </body>
