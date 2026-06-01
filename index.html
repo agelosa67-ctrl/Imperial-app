@@ -315,6 +315,58 @@
         .hdr-btn.danger-clear:hover { background: #fecaca; }
         .hdr-btn.overview-btn { background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; }
         .hdr-btn.overview-btn.active { background: var(--primary); color: #fff; }
+        .hdr-btn.recovery-btn { background: #fef3c7; color: #d97706; border: 1px solid #fcd34d; }
+        .hdr-btn.history-btn  { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+
+        /* ── RECOVERY & HISTORY PANELS ── */
+        .side-panel {
+            display: none; position: fixed; inset: 0;
+            background: rgba(15,23,42,0.5); backdrop-filter: blur(4px);
+            z-index: 400; align-items: center; justify-content: center; padding: 16px;
+        }
+        .side-panel.open { display: flex; }
+        .side-panel-card {
+            background: #fff; border-radius: 18px;
+            width: 100%; max-width: 420px; max-height: 80vh;
+            display: flex; flex-direction: column;
+            animation: slideUp 0.2s cubic-bezier(0.34,1.3,0.64,1);
+        }
+        .side-panel-header {
+            padding: 14px 16px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-shrink: 0;
+        }
+        .side-panel-header h3 { margin: 0; font-size: 14px; font-weight: 800; }
+        .side-panel-header button {
+            background: #f1f5f9; border: none; border-radius: 8px;
+            padding: 5px 10px; font-size: 12px; font-weight: 700;
+            cursor: pointer; font-family: 'DM Sans', sans-serif;
+        }
+        .side-panel-body { padding: 12px; overflow-y: auto; flex: 1; }
+        .recovery-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 12px; border-radius: 10px; background: #f8fafc;
+            border: 1px solid var(--border); margin-bottom: 6px;
+        }
+        .recovery-item-info { font-size: 12px; }
+        .recovery-item-info strong { display: block; font-size: 13px; }
+        .recovery-item-info span { color: var(--muted); font-size: 11px; }
+        .recovery-restore-btn {
+            background: #fef3c7; color: #d97706; border: 1px solid #fcd34d;
+            border-radius: 8px; padding: 5px 10px; font-size: 11px; font-weight: 700;
+            cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap;
+        }
+        .history-date-group { margin-bottom: 10px; }
+        .history-date-label {
+            font-size: 10px; font-weight: 700; color: var(--muted);
+            letter-spacing: 1px; margin-bottom: 4px;
+        }
+        .history-item {
+            padding: 8px 10px; border-radius: 8px; background: #f8fafc;
+            border: 1px solid var(--border); margin-bottom: 4px;
+            font-size: 11px;
+        }
+        .history-item strong { color: var(--primary); }
 
         /* ── OVERVIEW PANEL ── */
         #overview-panel {
@@ -447,6 +499,32 @@
         </div>
     </div>
 
+    <!-- RECOVERY PANEL -->
+    <div id="recovery-panel" class="side-panel" onclick="if(event.target===this)toggleRecovery()">
+        <div class="side-panel-card">
+            <div class="side-panel-header">
+                <h3>↩ Ανεύρεση (24ώρες)</h3>
+                <button onclick="toggleRecovery()">✕</button>
+            </div>
+            <div class="side-panel-body" id="recovery-body">
+                <p style="color:var(--muted);text-align:center;font-size:12px">Δεν υπάρχουν διαγραμμένα στοιχεία</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- HISTORY PANEL -->
+    <div id="history-panel" class="side-panel" onclick="if(event.target===this)toggleHistory()">
+        <div class="side-panel-card">
+            <div class="side-panel-header">
+                <h3>📋 Ιστορικό Κρατήσεων</h3>
+                <button onclick="toggleHistory()">✕</button>
+            </div>
+            <div class="side-panel-body" id="history-body">
+                <p style="color:var(--muted);text-align:center;font-size:12px">Φόρτωση...</p>
+            </div>
+        </div>
+    </div>
+
     <!-- CONFIRM MODAL -->
     <div id="confirm-modal">
         <div class="confirm-card">
@@ -496,6 +574,7 @@
 
     <header>
         <!-- ROW 1: zoom | action btns | date -->
+        <input type="date" id="globalDate" style="display:none" onchange="changeWorkingDate()">
         <div class="header-row1">
             <div class="zoom-controls">
                 <button class="zoom-btn" onclick="applyZoom(-0.1)">−</button>
@@ -503,15 +582,13 @@
                 <button class="zoom-btn" onclick="applyZoom(0.1)">+</button>
             </div>
             <div class="header-action-btns">
-                <button class="hdr-btn secondary" onclick="addNewCustomUmbrella()">+</button>
-                <button class="hdr-btn danger-clear" onclick="clearDay()">🗑</button>
-                <button class="hdr-btn overview-btn" id="overview-btn" onclick="toggleOverview()">🗺</button>
+                <button class="hdr-btn secondary" onclick="addNewCustomUmbrella()" title="Νέα ομπρέλα">+</button>
+                <button class="hdr-btn recovery-btn" onclick="toggleRecovery()" title="Ανεύρεση">↩</button>
+                <button class="hdr-btn history-btn" onclick="toggleHistory()" title="Ιστορικό">📋</button>
+                <button class="hdr-btn overview-btn" id="overview-btn" onclick="toggleOverview()" title="Χάρτης">🗺</button>
+                <button class="hdr-btn danger-clear" onclick="clearDay()" title="Εκκαθάριση" style="font-size:9px;padding:3px 5px;">🗑</button>
+            </div>
 
-            </div>
-            <div class="date-picker-wrapper">
-                <label>Ημ:</label>
-                <input type="date" id="globalDate" class="date-input" onchange="changeWorkingDate()">
-            </div>
         </div>
         <!-- ROW 2: stat badges | search | action btns -->
         <div class="header-row2">
@@ -613,6 +690,83 @@
 
         let masterUmbrellasList = {};
         let overviewOpen = false;
+        let recoveryOpen = false;
+        let historyOpen = false;
+
+        function toggleRecovery() {
+            recoveryOpen = !recoveryOpen;
+            document.getElementById('recovery-panel').classList.toggle('open', recoveryOpen);
+            if (recoveryOpen) loadRecovery();
+        }
+
+        function loadRecovery() {
+            database.ref('recovery').once('value', snap => {
+                const data = snap.val() || {};
+                const now = Date.now();
+                let html = '';
+                // Clean expired
+                Object.entries(data).forEach(([key, item]) => {
+                    if (item.expiresAt < now) {
+                        database.ref('recovery/'+key).remove();
+                        return;
+                    }
+                    const hoursLeft = Math.ceil((item.expiresAt - now) / 3600000);
+                    const b = item.booking || {};
+                    html += `<div class="recovery-item">
+                        <div class="recovery-item-info">
+                            <strong>Ομπρέλα ${item.num}</strong>
+                            <span>${b.name||'Χωρίς όνομα'} · ${item.date} · ${hoursLeft}ώρ. απομένουν</span>
+                        </div>
+                        <button class="recovery-restore-btn" onclick="restoreItem('${key}')">↩ Επαναφορά</button>
+                    </div>`;
+                });
+                document.getElementById('recovery-body').innerHTML = html ||
+                    '<p style="color:var(--muted);text-align:center;font-size:12px">Δεν υπάρχουν διαγραμμένα στοιχεία</p>';
+            });
+        }
+
+        function restoreItem(key) {
+            database.ref('recovery/'+key).once('value', snap => {
+                const item = snap.val();
+                if (!item) return;
+                database.ref('master_umbrellas/'+item.num).set({number: parseInt(item.num)});
+                if (item.booking && Object.keys(item.booking).length) {
+                    database.ref('bookings_by_date/'+item.date+'/'+item.num).set(item.booking);
+                }
+                database.ref('recovery/'+key).remove();
+                loadRecovery();
+            });
+        }
+
+        function toggleHistory() {
+            historyOpen = !historyOpen;
+            document.getElementById('history-panel').classList.toggle('open', historyOpen);
+            if (historyOpen) loadHistory();
+        }
+
+        function loadHistory() {
+            database.ref('bookings_by_date').once('value', snap => {
+                const data = snap.val() || {};
+                const dates = Object.keys(data).sort().reverse();
+                let html = '';
+                dates.forEach(date => {
+                    const bookings = data[date];
+                    const reserved = Object.values(bookings).filter(b => b.status && b.status !== 'free');
+                    if (!reserved.length) return;
+                    html += `<div class="history-date-group">
+                        <div class="history-date-label">${date}</div>`;
+                    reserved.forEach(b => {
+                        html += `<div class="history-item">
+                            <strong>Ομπρέλα ${b.number||''}</strong> · ${b.name||'-'} · <span style="color:var(--muted)">${b.status||''}</span>
+                            ${b.time?' · '+b.time:''} ${b.notes?' · '+b.notes:''}
+                        </div>`;
+                    });
+                    html += '</div>';
+                });
+                document.getElementById('history-body').innerHTML = html ||
+                    '<p style="color:var(--muted);text-align:center;font-size:12px">Δεν υπάρχει ιστορικό</p>';
+            });
+        }
         let popupCurrentNum = null;
 
         function openStatusPopup(num) {
@@ -677,6 +831,16 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('globalDate').value = today;
             startLiveSync();
+            // Auto-cleanup recovery every hour
+            setInterval(() => {
+                database.ref('recovery').once('value', snap => {
+                    const data = snap.val() || {};
+                    const now = Date.now();
+                    Object.entries(data).forEach(([key, item]) => {
+                        if (item.expiresAt < now) database.ref('recovery/'+key).remove();
+                    });
+                });
+            }, 3600000);
         };
 
         function applyZoom(dir) {
@@ -733,8 +897,19 @@
 
         function deleteUmbrella(num) {
             if (!confirm("Διαγραφή ομπρέλας "+num+" μόνιμα;")) return;
+            const d = document.getElementById('globalDate').value;
+            const booking = (dailyBookings || {})[num] || {};
+            // Save to recovery with 24h expiry
+            const recoveryData = {
+                num: num,
+                booking: booking,
+                date: d,
+                deletedAt: Date.now(),
+                expiresAt: Date.now() + 24*60*60*1000
+            };
+            database.ref('recovery/'+Date.now()).set(recoveryData);
             database.ref('master_umbrellas/'+num).remove();
-            database.ref('bookings_by_date/'+document.getElementById('globalDate').value+'/'+num).remove();
+            database.ref('bookings_by_date/'+d+'/'+num).remove();
         }
 
         function clearDay() {
