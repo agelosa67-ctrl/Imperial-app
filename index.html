@@ -265,11 +265,6 @@
         .ov-broken   { background: #fcd34d; color: #78350f; }
         .ov-together { background: #d97706; color: #fff; }
 
-        /* ── HISTORY ITEMS ── */
-        .history-date-group { margin-bottom: 12px; }
-        .history-date-label { font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 1px; margin-bottom: 6px; text-transform: uppercase; }
-        .history-item { font-size: 11px; padding: 5px 8px; border-radius: 8px; background: #f8fafc; margin-bottom: 3px; border-left: 3px solid var(--border); }
-
         /* ── RECOVERY ITEMS ── */
         .recovery-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8fafc; border-radius: 8px; margin-bottom: 6px; gap: 8px; }
         .recovery-item-info { flex: 1; }
@@ -302,7 +297,6 @@
         .hdr-btn.overview-btn { background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; }
         .hdr-btn.overview-btn.active { background: var(--primary); color: #fff; }
         .hdr-btn.recovery-btn { background: #fef3c7; color: #d97706; border: 1px solid #fcd34d; }
-        .hdr-btn.history-btn  { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
 
         .staff-btn {
             padding: 7px 12px; border: 1.5px solid #e2e8f0; border-radius: 20px;
@@ -357,7 +351,6 @@
 </head>
 <body>
 
-    <!-- STATUS POPUP -->
     <div id="status-popup" onclick="if(event.target===this)closeStatusPopup()">
         <div class="status-popup-card">
             <div class="status-popup-title" id="status-popup-title">Ομπρέλα 000</div>
@@ -376,7 +369,7 @@
                 <input id="sp-time" type="text" placeholder="Ώρα" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('time',this.value)">
                 
                 <div style="position:relative; width:100%;">
-                    <input id="sp-consumption" type="text" placeholder="Καπανάλωση (€) π.χ. 10+5+20" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;padding-right:75px;" oninput="updatePopupField('consumption',this.value); updatePopupConsumptionTotal(this.value);">
+                    <input id="sp-consumption" type="text" placeholder="Κατανάλωση (€) π.χ. 10+5+20" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;padding-right:75px;" oninput="updatePopupField('consumption',this.value); updatePopupConsumptionTotal(this.value);">
                     <span id="sp-consumption-total" style="position:absolute; right:12px; top:11px; font-size:13px; font-weight:700; color:var(--success); pointer-events:none;"></span>
                 </div>
 
@@ -392,12 +385,11 @@
                 <button class="sp-btn sp-special"  onclick="setStatusFromPopup('special')">⭐<br>Special</button>
                 <button class="sp-btn sp-broken"   onclick="setStatusFromPopup('broken')">🔧<br>Χαλ.</button>
                 <button class="sp-btn sp-together" onclick="setStatusFromPopup('together')">Κρ. Μαζί</button>
-                <button class="sp-btn sp-close"    onclick="closeStatusPopup()">✕ Κλείσιμο Παραθύρου</button>
+                <button class="sp-btn sp-close"    onclick="closeStatusPopup()">✕ Κλείσιμο</button>
             </div>
         </div>
     </div>
 
-    <!-- ADMIN PIN MODAL -->
     <div id="admin-pin-modal" class="side-panel" style="z-index:999;" onclick="if(event.target===this)closeAdminModal()">
         <div class="side-panel-card" style="max-width:320px; padding:24px; align-items:center; gap:16px;">
             <h3 style="margin:0; font-family:'DM Sans',sans-serif; font-size:16px;">🔐 Κωδικός Διαχειριστή</h3>
@@ -409,7 +401,6 @@
         </div>
     </div>
 
-    <!-- RECOVERY PANEL -->
     <div id="recovery-panel" class="side-panel" onclick="if(event.target===this)toggleRecovery()">
         <div class="side-panel-card">
             <div class="side-panel-header">
@@ -422,23 +413,6 @@
         </div>
     </div>
 
-    <!-- HISTORY PANEL -->
-    <div id="history-panel" class="side-panel" onclick="if(event.target===this)toggleHistory()">
-        <div class="side-panel-card">
-            <div class="side-panel-header">
-                <h3>📋 Ιστορικό Κρατήσεων</h3>
-                <div style="display:flex;gap:6px;align-items:center;">
-                    <button onclick="saveDailyBackup()" style="background:#fef3c7;color:#d97706;border:1px solid #fcd34d;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">💾 Backup 16ώρ.</button>
-                    <button onclick="toggleHistory()">✕</button>
-                </div>
-            </div>
-            <div class="side-panel-body" id="history-body">
-                <p style="color:var(--muted);text-align:center;font-size:12px">Φόρτωση...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- CONFIRM MODAL -->
     <div id="confirm-modal">
         <div class="confirm-card">
             <div class="confirm-icon">🗑️</div>
@@ -451,7 +425,6 @@
         </div>
     </div>
 
-    <!-- PIN OVERLAY -->
     <div id="pin-overlay">
         <div class="pin-logo">Imperial Beach<small>MANAGEMENT SUITE</small></div>
         <div class="pin-card">
@@ -483,7 +456,6 @@
         </div>
     </div>
 
-    <!-- HEADER -->
     <header>
         <input type="date" id="globalDate" style="display:none" onchange="changeWorkingDate()">
         <div class="header-row1">
@@ -493,10 +465,9 @@
                 <button class="zoom-btn" onclick="applyZoom(0.1)">+</button>
             </div>
             <div class="header-action-btns">
-                <button class="hdr-btn" id="admin-status-btn" onclick="handleAdminStatusClick()" title="Κατάσταση Κλειδώματος Admin">🔒 Admin</button>
+                <button class="hdr-btn" id="admin-status-btn" onclick="handleAdminStatusClick()" title="Κατάσταση Κλειδώματος Admin">🔒</button>
                 <button class="hdr-btn secondary" onclick="addNewCustomUmbrella()" title="Νέα ομπρέλα">+</button>
                 <button class="hdr-btn recovery-btn" onclick="toggleRecovery()" title="Ανεύρεση">↩</button>
-                <button class="hdr-btn history-btn" onclick="toggleHistory()" title="Ιστορικό">📋</button>
                 <button class="hdr-btn overview-btn" id="overview-btn" onclick="toggleOverview()" title="Χάρτης">🗺</button>
                 <button class="hdr-btn danger-clear" onclick="clearDay()" title="Εκκαθάριση" style="font-size:9px;padding:3px 5px;">🗑</button>
             </div>
@@ -535,7 +506,6 @@
         </div>
     </main>
 
-    <!-- OVERVIEW PANEL -->
     <div id="overview-panel">
         <div class="overview-topbar">
             <h3>🗺 Χάρτης Παραλίας</h3>
@@ -602,23 +572,22 @@
         let masterUmbrellasList = {};
         let overviewOpen = false;
         let recoveryOpen = false;
-        let historyOpen = false;
         
-        // ── ADMIN MODAL LOGIC ──
+        // ── ADMIN MODAL LOGIC (GLOBAL SYNC) ──
         const ADMIN_PIN = '0852';
         let adminCallback = null;
+        let globalAdminAuthed = false;
 
         function updateAdminButtonUI() {
             const btn = document.getElementById('admin-status-btn');
             if (!btn) return;
-            const isAuthed = localStorage.getItem('admin_authed') === 'true';
-            if (isAuthed) {
-                btn.textContent = '🔓 Admin';
+            if (globalAdminAuthed) {
+                btn.textContent = '🔓';
                 btn.style.background = '#dcfce7';
                 btn.style.color = '#15803d';
                 btn.style.borderColor = '#bbf7d0';
             } else {
-                btn.textContent = '🔒 Admin';
+                btn.textContent = '🔒';
                 btn.style.background = '#fee2e2';
                 btn.style.color = '#b91c1c';
                 btn.style.borderColor = '#fecaca';
@@ -626,24 +595,24 @@
         }
 
         function handleAdminStatusClick() {
-            document.getElementById('admin-pin-input').value = '';
-            document.getElementById('admin-pin-modal').classList.add('open');
-            
-            adminCallback = function() {
-                const isAuthed = localStorage.getItem('admin_authed') === 'true';
-                if (isAuthed) {
-                    localStorage.removeItem('admin_authed');
-                    alert('🔒 Ο Admin κλείδωσε με επιτυχία!');
-                } else {
-                    localStorage.setItem('admin_authed', 'true');
-                    alert('🔓 Ο Admin ξεκλειδώσε με επιτυχία!');
-                }
-                updateAdminButtonUI();
-            };
+            if (globalAdminAuthed) {
+                // Αν είναι ξεκλείδωτο, πατώντας το κλειδώνει άμεσα για όλους.
+                database.ref('admin_unlocked').set(false);
+                alert('🔒 Ο Admin κλείδωσε με επιτυχία!');
+            } else {
+                // Ζητάει PIN για να ξεκλειδώσει για όλους.
+                document.getElementById('admin-pin-input').value = '';
+                document.getElementById('admin-pin-modal').classList.add('open');
+                
+                adminCallback = function() {
+                    database.ref('admin_unlocked').set(true);
+                    alert('🔓 Ο Admin ξεκλείδωσε με επιτυχία για όλους!');
+                };
+            }
         }
 
         function requireAdmin(callback) {
-            if (localStorage.getItem('admin_authed') === 'true') {
+            if (globalAdminAuthed) {
                 if (callback) callback();
                 return;
             }
@@ -660,6 +629,8 @@
         function submitAdminPin() {
             const pin = document.getElementById('admin-pin-input').value;
             if (pin === ADMIN_PIN) {
+                // Επιτυχής εισαγωγή PIN -> ξεκλείδωμα στη βάση για όλους.
+                database.ref('admin_unlocked').set(true);
                 if (adminCallback) adminCallback();
                 closeAdminModal();
             } else {
@@ -715,103 +686,6 @@
                 }
                 database.ref('recovery/'+key).remove();
                 loadRecovery();
-            });
-        }
-
-        function toggleHistory() {
-            if (!historyOpen) {
-                requireAdmin(() => {
-                    historyOpen = true;
-                    document.getElementById('history-panel').classList.add('open');
-                    loadHistory();
-                });
-            } else {
-                historyOpen = false;
-                document.getElementById('history-panel').classList.remove('open');
-            }
-        }
-
-        function loadHistory() {
-            const today = document.getElementById('globalDate').value;
-            // Carica il backup giornaliero (16h TTL) + storico completo
-            database.ref('daily_backup').once('value', backupSnap => {
-                const backupData = backupSnap.val() || {};
-                const now = Date.now();
-                // Pulizia backup scaduti
-                Object.entries(backupData).forEach(([key, item]) => {
-                    if (item.expiresAt && item.expiresAt < now) {
-                        database.ref('daily_backup/' + key).remove();
-                    }
-                });
-
-                database.ref('bookings_by_date').once('value', snap => {
-                    const data = snap.val() || {};
-                    const dates = Object.keys(data).sort().reverse();
-                    let html = '';
-
-                    // Εμφάνιση backup ημέρας αν υπάρχει
-                    const todayBackup = backupData[today];
-                    if (todayBackup && todayBackup.expiresAt > now) {
-                        const hoursLeft = Math.ceil((todayBackup.expiresAt - now) / 3600000);
-                        html += `<div class="history-date-group" style="border:1.5px solid #fcd34d;border-radius:10px;padding:8px;margin-bottom:10px;background:#fffbeb;">
-                            <div class="history-date-label" style="color:#d97706;">💾 Backup ${today} · ${hoursLeft}ώρ. απομένουν</div>`;
-                        const bk = todayBackup.bookings || {};
-                        Object.values(bk).filter(b => b.status && b.status !== 'free').forEach(b => {
-                            html += `<div class="history-item">
-                                <strong>Ομπρέλα ${b.number||''}</strong> · ${b.customer||b.name||'-'} · <span style="color:var(--muted)">${b.status||''}</span>
-                                ${b.time?' · '+b.time:''} ${b.notes?' · '+b.notes:''}
-                            </div>`;
-                        });
-                        html += '</div>';
-                    }
-
-                    dates.forEach(date => {
-                        const bookings = data[date];
-                        const reserved = Object.values(bookings).filter(b => b.status && b.status !== 'free');
-                        if (!reserved.length) return;
-                        html += `<div class="history-date-group">
-                            <div class="history-date-label">${date}</div>`;
-                        reserved.forEach(b => {
-                            html += `<div class="history-item">
-                                <strong>Ομπρέλα ${b.number||''}</strong> · ${b.customer||b.name||'-'} · <span style="color:var(--muted)">${b.status||''}</span>
-                                ${b.time?' · '+b.time:''} ${b.notes?' · '+b.notes:''}
-                            </div>`;
-                        });
-                        html += '</div>';
-                    });
-                    document.getElementById('history-body').innerHTML = html ||
-                        '<p style="color:var(--muted);text-align:center;font-size:12px">Δεν υπάρχει ιστορικό</p>';
-                });
-            });
-        }
-
-        // Αποθήκευση backup ημέρας με TTL 16 ωρών
-        function saveDailyBackup(silent) {
-            const d = document.getElementById('globalDate').value;
-            const snapshot = JSON.parse(JSON.stringify(dailyBookings));
-            const backupEntry = {
-                date: d,
-                bookings: snapshot,
-                savedAt: Date.now(),
-                expiresAt: Date.now() + 16 * 60 * 60 * 1000  // 16 ώρες
-            };
-            database.ref('daily_backup/' + d).set(backupEntry)
-                .then(() => { if (!silent) alert('💾 Backup αποθηκεύτηκε! Θα διαγραφεί αυτόματα σε 16 ώρες.'); })
-                .catch(e => { if (!silent) alert('Σφάλμα backup: ' + e); });
-        }
-
-        // Αυτόματο backup μία φορά την ημέρα (αν δεν υπάρχει ήδη backup για σήμερα)
-        function autoBackupIfNeeded() {
-            const d = document.getElementById('globalDate').value;
-            const today = new Date().toISOString().split('T')[0];
-            if (d !== today) return; // Μόνο για την τρέχουσα ημέρα
-            database.ref('daily_backup/' + d).once('value', snap => {
-                const existing = snap.val();
-                const now = Date.now();
-                // Κάνε backup μόνο αν δεν υπάρχει ήδη έγκυρο (< 16ω)
-                if (!existing || !existing.expiresAt || existing.expiresAt < now) {
-                    saveDailyBackup(true); // silent
-                }
             });
         }
 
@@ -1012,7 +886,13 @@
 
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('globalDate').value = today;
-            updateAdminButtonUI();
+            
+            // Παρακολούθηση της κατάστασης του Admin Live
+            database.ref('admin_unlocked').on('value', snap => {
+                globalAdminAuthed = !!snap.val();
+                updateAdminButtonUI();
+            });
+
             startLiveSync();
             setInterval(() => {
                 database.ref('recovery').once('value', snap => {
@@ -1050,7 +930,7 @@
             renderDashboard();
         }
 
-        function changeWorkingDate() { startLiveSync._backupDone = false; startLiveSync(); }
+        function changeWorkingDate() { startLiveSync(); }
 
         function startLiveSync() {
             const selectedDate = document.getElementById('globalDate').value;
@@ -1064,15 +944,9 @@
                 database.ref('bookings_by_date/'+selectedDate).on('value', (b) => {
                     dailyBookings = b.val() || {};
                     renderDashboard();
-                    // Αυτόματο backup μία φορά μετά το πρώτο φόρτωμα της ημέρας
-                    if (!startLiveSync._backupDone) {
-                        startLiveSync._backupDone = true;
-                        setTimeout(autoBackupIfNeeded, 2000);
-                    }
                 });
             });
         }
-        startLiveSync._backupDone = false;
 
         function addNewCustomUmbrella() { requireAdmin(() => _addNewCustomUmbrella()); }
         function _addNewCustomUmbrella() {
