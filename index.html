@@ -224,6 +224,19 @@
         .input-field::placeholder, .card-inline-field::placeholder { color: #cbd5e1; }
         .input-field:focus, .card-inline-field:focus { border-bottom-color: var(--primary); }
 
+        /* ΝΕΑ ΣΤΟΙΧΕΙΑ ΓΙΑ ΤΗΝ ΚΑΤΑΣΤΑΣΗ ΠΛΗΡΩΜΗΣ */
+        .consumption-wrapper {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 2px;
+        }
+        .payment-toggle-btn {
+            background: none; border: none; cursor: pointer; font-size: 11px; padding: 2px;
+            display: flex; align-items: center; justify-content: center; transition: transform 0.1s;
+        }
+        .payment-toggle-btn:active { transform: scale(0.85); }
+
         /* ── SIDE PANELS ── */
         .side-panel {
             display: none; position: fixed; inset: 0;
@@ -327,7 +340,6 @@
 </head>
 <body>
 
-    <!-- STATUS POPUP -->
     <div id="status-popup" onclick="if(event.target===this)closeStatusPopup()">
         <div class="status-popup-card">
             <div class="status-popup-title" id="status-popup-title">Ομπρέλα 000</div>
@@ -336,7 +348,7 @@
                     <div style="font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:4px;">ΥΠΑΛΛΗΛΟΣ</div>
                     <div style="display:flex;gap:6px;flex-wrap:wrap;">
                         <button class="staff-btn" onclick="selectStaff('Edisa')">Edisa</button>
-                        <button class="staff-btn" onclick="selectStaff('Anananias')">Anananias</button>
+                        <button class="staff-btn" onclick="selectStaff('Ananias')">Ananias</button>
                         <button class="staff-btn" onclick="selectStaff('Savvas')">Savvas</button>
                         <button class="staff-btn" onclick="selectStaff('Sidorela')">Sidorela</button>
                     </div>
@@ -345,9 +357,12 @@
                 <input id="sp-customer" type="text" placeholder="Όνομα πελάτη" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('customer',this.value)">
                 <input id="sp-time" type="text" placeholder="Ώρα" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('time',this.value)">
                 
-                <div style="position:relative; width:100%;">
-                    <input id="sp-consumption" type="text" placeholder="Κατανάλωση (€) π.χ. 10+5+20" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;padding-right:75px;" oninput="updatePopupField('consumption',this.value); updatePopupConsumptionTotal(this.value);">
-                    <span id="sp-consumption-total" style="position:absolute; right:12px; top:11px; font-size:13px; font-weight:700; color:var(--success); pointer-events:none;"></span>
+                <div style="position:relative; width:100%; display:flex; align-items:center; gap:8px;">
+                    <div style="position:relative; flex:1;">
+                        <input id="sp-consumption" type="text" placeholder="Κατανάλωση (€) π.χ. 10+5+20" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;padding-right:75px;" oninput="updatePopupField('consumption',this.value); updatePopupConsumptionTotal(this.value);">
+                        <span id="sp-consumption-total" style="position:absolute; right:12px; top:11px; font-size:13px; font-weight:700; color:var(--success); pointer-events:none;"></span>
+                    </div>
+                    <button id="sp-payment-btn" onclick="togglePaymentStatusFromPopup()" style="padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-size:14px; background:#f8fafc; cursor:pointer;">⭕</button>
                 </div>
 
                 <input id="sp-notes" type="text" placeholder="Σημειώσεις" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('notes',this.value)">
@@ -367,7 +382,6 @@
         </div>
     </div>
 
-    <!-- ADMIN PIN MODAL -->
     <div id="admin-pin-modal" class="side-panel" style="z-index:999;" onclick="if(event.target===this)closeAdminModal()">
         <div class="side-panel-card" style="max-width:320px; padding:24px; align-items:center; gap:16px;">
             <h3 style="margin:0; font-family:'DM Sans',sans-serif; font-size:16px;">🔐 Κωδικός Διαχειριστή</h3>
@@ -379,7 +393,6 @@
         </div>
     </div>
 
-    <!-- CONFIRM MODAL -->
     <div id="confirm-modal">
         <div class="confirm-card">
             <div class="confirm-icon">🗑️</div>
@@ -392,7 +405,6 @@
         </div>
     </div>
 
-    <!-- PIN OVERLAY -->
     <div id="pin-overlay">
         <div class="pin-logo">Imperial Beach<small>MANAGEMENT SUITE</small></div>
         <div class="pin-card">
@@ -424,7 +436,6 @@
         </div>
     </div>
 
-    <!-- HEADER -->
     <header>
         <input type="date" id="globalDate" style="display:none" onchange="changeWorkingDate()">
         <div class="header-row1">
@@ -475,7 +486,6 @@
         </div>
     </main>
 
-    <!-- OVERVIEW PANEL -->
     <div id="overview-panel">
         <div class="overview-topbar">
             <h3>🗺 Χάρτης Παραλίας</h3>
@@ -662,7 +672,30 @@
             document.getElementById('sp-notes2').value      = b.notes2      || '';
             document.getElementById('sp-linked').value      = '';
             
+            // Ενημέρωση Κουμπιού Πληρωμής στο Popup
+            const isPaid = b.isPaid === 'yes' || b.isPaid === true;
+            const pBtn = document.getElementById('sp-payment-btn');
+            pBtn.textContent = isPaid ? '✅' : '⭕';
+            pBtn.style.background = isPaid ? '#dcfce7' : '#f8fafc';
+            pBtn.style.borderColor = isPaid ? '#16a34a' : '#cbd5e1';
+
             document.getElementById('status-popup').classList.add('open');
+        }
+
+        function togglePaymentStatusFromPopup() {
+            if (!popupCurrentNum) return;
+            const b = (dailyBookings || {})[popupCurrentNum] || {};
+            const currentPaid = b.isPaid === 'yes' || b.isPaid === true;
+            const newPaid = !currentPaid;
+            
+            updatePopupField('isPaid', newPaid);
+            
+            const pBtn = document.getElementById('sp-payment-btn');
+            pBtn.textContent = newPaid ? '✅' : '⭕';
+            pBtn.style.background = newPaid ? '#dcfce7' : '#f8fafc';
+            pBtn.style.borderColor = newPaid ? '#16a34a' : '#cbd5e1';
+            
+            autoSyncLinkedCoreFields();
         }
 
         function selectStaff(name) {
@@ -698,14 +731,11 @@
             const currentBooking = dailyBookings[popupCurrentNum] || {};
             const currentStatus = currentBooking.status || 'free';
 
-            // Αν πατήσει το ίδιο Status δεν γίνεται τίποτα
             if (status === currentStatus) {
                 closeStatusPopup();
                 return;
             }
 
-            // Αν η ομπρέλα είναι ΗΔΗ σε «Κράτηση» ή «Κρ. Μαζί» και 
-            // προσπαθεί να της ΑΛΛΑΞΕΙ την κατάσταση
             if (currentStatus === 'reserved' || currentStatus === 'together') {
                 if (globalUnlockState < 1) {
                     requireAdmin(1, () => { executeStatusChange(status); });
@@ -713,8 +743,6 @@
                 }
             }
             
-            // Για όλες τις άλλες περιπτώσεις (ήταν ελεύθερη ή ήταν Ξενοδοχείο/Special/Χαλασμένη)
-            // η αλλαγή γίνεται άμεσα χωρίς κωδικό!
             executeStatusChange(status);
         }
 
@@ -723,7 +751,7 @@
             
             if (status === 'free') {
                 database.ref('bookings_by_date/' + d + '/' + popupCurrentNum).set({
-                    status: 'free', customer: '', staff: '', time: '', consumption: '', notes: '', notes2: ''
+                    status: 'free', customer: '', staff: '', time: '', consumption: '', isPaid: false, notes: '', notes2: ''
                 });
                 closeStatusPopup();
             } else {
@@ -732,6 +760,12 @@
                 autoSyncLinkedCoreFields();
                 setTimeout(() => closeStatusPopup(), 600);
             }
+        }
+
+        function toggleCardPaymentStatus(num) {
+            const b = dailyBookings[num] || {};
+            const currentPaid = b.isPaid === 'yes' || b.isPaid === true;
+            updateField(num, 'isPaid', !currentPaid);
         }
 
         // ── ΑΥΤΟΜΑΤΟΣ ΣΥΓΧΡΟΝΙΣΜΟΣ ──
@@ -749,6 +783,7 @@
             const currentBooking = dailyBookings[popupCurrentNum] || {};
             const status         = currentBooking.status || 'free';
             const staff          = currentBooking.staff || '';
+            const isPaid         = currentBooking.isPaid || false;
 
             linkedUmbrellas.forEach(num => {
                 if (masterUmbrellasList[num]) {
@@ -757,6 +792,7 @@
                         customer: customer,
                         staff: staff,
                         consumption: consumption,
+                        isPaid: isPaid,
                         time: time
                     });
                 }
@@ -880,7 +916,6 @@
         }
 
         function addNewCustomUmbrella() { 
-            // Απαιτείται επίπεδο 2 (Ολικό)
             requireAdmin(2, () => _addNewCustomUmbrella()); 
         }
         function _addNewCustomUmbrella() {
@@ -892,18 +927,17 @@
         }
 
         function deleteUmbrella(num) { 
-            // Απαιτείται επίπεδο 2 (Ολικό)
             requireAdmin(2, () => _deleteUmbrella(num)); 
         }
         function _deleteUmbrella(num) {
             if (!confirm("Διαγραφή ομπρέλας "+num+" μόνιμα;")) return;
             const d = document.getElementById('globalDate').value;
+            masterUmbrellasList[num] = null;
             database.ref('master_umbrellas/'+num).remove();
             database.ref('bookings_by_date/'+d+'/'+num).remove();
         }
 
         function clearDay() { 
-            // Απαιτείται τουλάχιστον επίπεδο 1 (Μερικό)
             requireAdmin(1, () => _clearDay()); 
         }
         function _clearDay() {
@@ -996,6 +1030,7 @@
 
                 grouped[rowKey].forEach(num => {
                     const b = dailyBookings[num] || {status:'free'};
+                    const isPaid = b.isPaid === 'yes' || b.isPaid === true;
 
                     let fillColor, textColor, bgTint;
                     switch(b.status) {
@@ -1029,7 +1064,14 @@
                         <div class="inputs-form">
                             <input class="card-inline-field card-customer-field" placeholder="Πελάτης" value="${b.customer||''}" onchange="updateField('${num}','customer',this.value)" onclick="event.stopPropagation()" style="font-weight:700; border-bottom: 1px dashed #cbd5e1;">
                             <input class="card-inline-field card-staff-field" placeholder="Υπαλ." value="${b.staff||''}" onchange="updateField('${num}','staff',this.value)" onclick="event.stopPropagation()">
-                            <input class="card-inline-field card-consumption-field" placeholder="€" type="text" value="${b.consumption||''}" onchange="updateField('${num}','consumption',this.value)" onclick="event.stopPropagation()" title="Σύνολο: ${safeEvalConsumption(b.consumption)}€">
+                            
+                            <div class="consumption-wrapper" onclick="event.stopPropagation()">
+                                <input class="card-inline-field card-consumption-field" placeholder="€" type="text" value="${b.consumption||''}" onchange="updateField('${num}','consumption',this.value)" title="Σύνολο: ${safeEvalConsumption(b.consumption)}€">
+                                <button class="payment-toggle-btn" onclick="toggleCardPaymentStatus('${num}')" title="${isPaid ? 'Πληρωμένο' : 'Απλήρωτο'}">
+                                    ${isPaid ? '✅' : '⭕'}
+                                </button>
+                            </div>
+
                             <input class="card-inline-field card-notes-field" placeholder="Σημ." value="${b.notes||''}" onchange="updateField('${num}','notes',this.value)" onclick="event.stopPropagation()">
                         </div>
                     `;
