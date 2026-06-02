@@ -14,7 +14,6 @@
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -115,13 +114,6 @@
             display: flex; align-items: center;
             gap: 5px; flex-wrap: nowrap;
         }
-
-        .logo-area { flex-shrink: 0; }
-        .logo-area h1 {
-            margin: 0; font-family: 'Bebas Neue', sans-serif;
-            font-size: 20px; letter-spacing: 3px; color: var(--text);
-        }
-        .logo-area span { font-size: 9px; color: var(--muted); letter-spacing: 2px; }
 
         .zoom-controls {
             display: flex; align-items: center; gap: 4px;
@@ -243,16 +235,6 @@
             background: #fff; border-radius: 18px; width: 100%; max-width: 420px; max-height: 80vh;
             display: flex; flex-direction: column; animation: slideUp 0.2s cubic-bezier(0.34,1.3,0.64,1);
         }
-        .side-panel-header {
-            padding: 14px 16px; border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
-        }
-        .side-panel-header h3 { margin: 0; font-size: 14px; font-weight: 800; }
-        .side-panel-header button {
-            background: #f1f5f9; border: none; border-radius: 8px; padding: 5px 10px; font-size: 12px;
-            font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif;
-        }
-        .side-panel-body { padding: 12px; overflow-y: auto; flex: 1; }
         
         /* ── OVERVIEW CELLS ── */
         .ov-legend { display: flex; flex-wrap: wrap; gap: 8px; padding: 6px 12px; background: var(--surface); border-radius: 10px; margin-bottom: 8px; }
@@ -265,11 +247,6 @@
         .ov-broken   { background: #fcd34d; color: #78350f; }
         .ov-together { background: #d97706; color: #fff; }
 
-        /* ── RECOVERY ITEMS ── */
-        .recovery-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8fafc; border-radius: 8px; margin-bottom: 6px; gap: 8px; }
-        .recovery-item-info { flex: 1; }
-        .recovery-item-info strong { display: block; font-size: 12px; }
-        .recovery-item-info span { font-size: 10px; color: var(--muted); }
         /* ── OVERVIEW PANEL ── */
         #overview-panel {
             display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow: auto; padding: 10px;
@@ -296,7 +273,6 @@
         .hdr-btn.danger-clear { background: #fee2e2; color: var(--danger); border: 1px solid #fecaca; font-size: 13px; }
         .hdr-btn.overview-btn { background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; }
         .hdr-btn.overview-btn.active { background: var(--primary); color: #fff; }
-        .hdr-btn.recovery-btn { background: #fef3c7; color: #d97706; border: 1px solid #fcd34d; }
 
         .staff-btn {
             padding: 7px 12px; border: 1.5px solid #e2e8f0; border-radius: 20px;
@@ -351,6 +327,7 @@
 </head>
 <body>
 
+    <!-- STATUS POPUP -->
     <div id="status-popup" onclick="if(event.target===this)closeStatusPopup()">
         <div class="status-popup-card">
             <div class="status-popup-title" id="status-popup-title">Ομπρέλα 000</div>
@@ -390,6 +367,7 @@
         </div>
     </div>
 
+    <!-- ADMIN PIN MODAL -->
     <div id="admin-pin-modal" class="side-panel" style="z-index:999;" onclick="if(event.target===this)closeAdminModal()">
         <div class="side-panel-card" style="max-width:320px; padding:24px; align-items:center; gap:16px;">
             <h3 style="margin:0; font-family:'DM Sans',sans-serif; font-size:16px;">🔐 Κωδικός Διαχειριστή</h3>
@@ -401,18 +379,7 @@
         </div>
     </div>
 
-    <div id="recovery-panel" class="side-panel" onclick="if(event.target===this)toggleRecovery()">
-        <div class="side-panel-card">
-            <div class="side-panel-header">
-                <h3>¾ Ανεύρεση (24ώρες)</h3>
-                <button onclick="toggleRecovery()">✕</button>
-            </div>
-            <div class="side-panel-body" id="recovery-body">
-                <p style="color:var(--muted);text-align:center;font-size:12px">Δεν υπάρχουν διαγραμμένα στοιχεία</p>
-            </div>
-        </div>
-    </div>
-
+    <!-- CONFIRM MODAL -->
     <div id="confirm-modal">
         <div class="confirm-card">
             <div class="confirm-icon">🗑️</div>
@@ -425,6 +392,7 @@
         </div>
     </div>
 
+    <!-- PIN OVERLAY -->
     <div id="pin-overlay">
         <div class="pin-logo">Imperial Beach<small>MANAGEMENT SUITE</small></div>
         <div class="pin-card">
@@ -456,6 +424,7 @@
         </div>
     </div>
 
+    <!-- HEADER -->
     <header>
         <input type="date" id="globalDate" style="display:none" onchange="changeWorkingDate()">
         <div class="header-row1">
@@ -465,9 +434,9 @@
                 <button class="zoom-btn" onclick="applyZoom(0.1)">+</button>
             </div>
             <div class="header-action-btns">
-                <button class="hdr-btn" id="admin-status-btn" onclick="handleAdminStatusClick()" title="Κατάσταση Κλειδώματος Admin">🔒</button>
+                <button class="hdr-btn" id="admin-partial-btn" onclick="handlePartialBtnClick()" title="Μερικό Ξεκλείδωμα (Κράτηση/Κρ. Μαζί/Εκκαθάριση)">🔒</button>
+                <button class="hdr-btn" id="admin-master-btn" onclick="handleMasterBtnClick()" title="Πλήρες Ξεκλείδωμα Όλων (Master)">🔐</button>
                 <button class="hdr-btn secondary" onclick="addNewCustomUmbrella()" title="Νέα ομπρέλα">+</button>
-                <button class="hdr-btn recovery-btn" onclick="toggleRecovery()" title="Ανεύρεση">↩</button>
                 <button class="hdr-btn overview-btn" id="overview-btn" onclick="toggleOverview()" title="Χάρτης">🗺</button>
                 <button class="hdr-btn danger-clear" onclick="clearDay()" title="Εκκαθάριση" style="font-size:9px;padding:3px 5px;">🗑</button>
             </div>
@@ -506,6 +475,7 @@
         </div>
     </main>
 
+    <!-- OVERVIEW PANEL -->
     <div id="overview-panel">
         <div class="overview-topbar">
             <h3>🗺 Χάρτης Παραλίας</h3>
@@ -571,123 +541,89 @@
 
         let masterUmbrellasList = {};
         let overviewOpen = false;
-        let recoveryOpen = false;
         
-        // ── ADMIN MODAL LOGIC (GLOBAL SYNC) ──
+        // ── AUTHENTICATION LEVELS LOGIC ──
         const ADMIN_PIN = '0852';
-        let adminCallback = null;
-        let globalAdminAuthed = false;
+        let globalUnlockState = 0; // 0 = Locked, 1 = Partial (Kράτηση/Κρ. Μαζί/Εκκαθάριση), 2 = Master (Τα πάντα)
+        
+        let intendedUnlockTarget = null;
+        let oneTimeCallback = null;
 
         function updateAdminButtonUI() {
-            const btn = document.getElementById('admin-status-btn');
-            if (!btn) return;
-            if (globalAdminAuthed) {
-                btn.textContent = '🔓';
-                btn.style.background = '#dcfce7';
-                btn.style.color = '#15803d';
-                btn.style.borderColor = '#bbf7d0';
-            } else {
-                btn.textContent = '🔒';
-                btn.style.background = '#fee2e2';
-                btn.style.color = '#b91c1c';
-                btn.style.borderColor = '#fecaca';
+            const pBtn = document.getElementById('admin-partial-btn');
+            const mBtn = document.getElementById('admin-master-btn');
+            if (!pBtn || !mBtn) return;
+
+            pBtn.textContent = '🔒';
+            pBtn.style.background = '#fee2e2'; pBtn.style.color = '#b91c1c'; pBtn.style.borderColor = '#fecaca';
+            mBtn.textContent = '🔐';
+            mBtn.style.background = '#f1f5f9'; mBtn.style.color = '#64748b'; mBtn.style.borderColor = '#e2e8f0';
+
+            if (globalUnlockState >= 1) {
+                pBtn.textContent = '🔓';
+                pBtn.style.background = '#dcfce7'; pBtn.style.color = '#15803d'; pBtn.style.borderColor = '#bbf7d0';
+            }
+            if (globalUnlockState === 2) {
+                mBtn.textContent = '🗝️';
+                mBtn.style.background = '#f3e8ff'; mBtn.style.color = '#7e22ce'; mBtn.style.borderColor = '#d8b4fe';
             }
         }
 
-        function handleAdminStatusClick() {
-            if (globalAdminAuthed) {
-                // Αν είναι ξεκλείδωτο, πατώντας το κλειδώνει άμεσα για όλους.
-                database.ref('admin_unlocked').set(false);
-                alert('🔒 Ο Admin κλείδωσε με επιτυχία!');
+        function handlePartialBtnClick() {
+            if (globalUnlockState >= 1) {
+                database.ref('admin_auth_level').set(0);
+                alert('🔒 Το σύστημα κλειδώθηκε.');
             } else {
-                // Ζητάει PIN για να ξεκλειδώσει για όλους.
+                intendedUnlockTarget = 1;
                 document.getElementById('admin-pin-input').value = '';
                 document.getElementById('admin-pin-modal').classList.add('open');
-                
-                adminCallback = function() {
-                    database.ref('admin_unlocked').set(true);
-                    alert('🔓 Ο Admin ξεκλείδωσε με επιτυχία για όλους!');
-                };
             }
         }
 
-        function requireAdmin(callback) {
-            if (globalAdminAuthed) {
+        function handleMasterBtnClick() {
+            if (globalUnlockState === 2) {
+                database.ref('admin_auth_level').set(0);
+                alert('🔒 Το σύστημα κλειδώθηκε.');
+            } else {
+                intendedUnlockTarget = 2;
+                document.getElementById('admin-pin-input').value = '';
+                document.getElementById('admin-pin-modal').classList.add('open');
+            }
+        }
+
+        function requireAdmin(requiredLevel, callback) {
+            if (globalUnlockState >= requiredLevel) {
                 if (callback) callback();
                 return;
             }
-            adminCallback = callback;
+            intendedUnlockTarget = null;
+            oneTimeCallback = callback;
             document.getElementById('admin-pin-input').value = '';
             document.getElementById('admin-pin-modal').classList.add('open');
         }
 
         function closeAdminModal() {
             document.getElementById('admin-pin-modal').classList.remove('open');
-            adminCallback = null;
+            intendedUnlockTarget = null;
+            oneTimeCallback = null;
         }
 
         function submitAdminPin() {
             const pin = document.getElementById('admin-pin-input').value;
             if (pin === ADMIN_PIN) {
-                // Επιτυχής εισαγωγή PIN -> ξεκλείδωμα στη βάση για όλους.
-                database.ref('admin_unlocked').set(true);
-                if (adminCallback) adminCallback();
+                if (intendedUnlockTarget !== null) {
+                    database.ref('admin_auth_level').set(intendedUnlockTarget);
+                    intendedUnlockTarget = null;
+                } else if (oneTimeCallback) {
+                    oneTimeCallback();
+                    oneTimeCallback = null;
+                }
                 closeAdminModal();
             } else {
                 alert('❌ Λάθος κωδικός Admin!');
             }
         }
 
-        function toggleRecovery() {
-            if (!recoveryOpen) {
-                requireAdmin(() => {
-                    recoveryOpen = true;
-                    document.getElementById('recovery-panel').classList.add('open');
-                    loadRecovery();
-                });
-            } else {
-                recoveryOpen = false;
-                document.getElementById('recovery-panel').classList.remove('open');
-            }
-        }
-
-        function loadRecovery() {
-            database.ref('recovery').once('value', snap => {
-                const data = snap.val() || {};
-                const now = Date.now();
-                let html = '';
-                Object.entries(data).forEach(([key, item]) => {
-                    if (item.expiresAt < now) {
-                        database.ref('recovery/'+key).remove();
-                        return;
-                    }
-                    const hoursLeft = Math.ceil((item.expiresAt - now) / 3600000);
-                    const b = item.booking || {};
-                    html += `<div class="recovery-item">
-                        <div class="recovery-item-info">
-                            <strong>Ομπρέλα ${item.num}</strong>
-                            <span>${b.name||'Χωρίς όνομα'} · ${item.date} · ${hoursLeft}ώρ. απομένουν</span>
-                        </div>
-                        <button class="recovery-restore-btn" onclick="restoreItem('${key}')">↩ Επαναφορά</button>
-                    </div>`;
-                });
-                document.getElementById('recovery-body').innerHTML = html ||
-                    '<p style="color:var(--muted);text-align:center;font-size:12px">Δεν υπάρχουν διαγραμμένα στοιχεία</p>';
-            });
-        }
-
-        function restoreItem(key) {
-            database.ref('recovery/'+key).once('value', snap => {
-                const item = snap.val();
-                if (!item) return;
-                database.ref('master_umbrellas/'+item.num).set({number: parseInt(item.num)});
-                if (item.booking && Object.keys(item.booking).length) {
-                    database.ref('bookings_by_date/'+item.date+'/'+item.num).set(item.booking);
-                }
-                database.ref('recovery/'+key).remove();
-                loadRecovery();
-            });
-        }
 
         let popupCurrentNum = null;
 
@@ -740,7 +676,6 @@
                 btn.classList.toggle('selected', btn.textContent === newName);
             });
             
-            // Auto sync core changes straight away
             autoSyncLinkedCoreFields();
         }
 
@@ -751,7 +686,6 @@
         
         function closeStatusPopup() {
             if (popupCurrentNum) {
-                // Αυτόματος συγχρονισμός βασικών στοιχείων πριν κλείσει εντελώς το popup
                 autoSyncLinkedCoreFields();
             }
             document.getElementById('status-popup').classList.remove('open');
@@ -760,17 +694,28 @@
 
         function setStatusFromPopup(status) {
             if (!popupCurrentNum) return;
-            const currentStatus = (dailyBookings[popupCurrentNum] || {}).status || 'free';
             
-            // Admin απαιτείται μόνο για αλλαγή ΑΠΟ reserved ή together → άλλο status
-            const needsAdmin = (currentStatus === 'reserved' && status !== 'reserved')
-                            || (currentStatus === 'together' && status !== 'together');
+            const currentBooking = dailyBookings[popupCurrentNum] || {};
+            const currentStatus = currentBooking.status || 'free';
 
-            if (needsAdmin) {
-                requireAdmin(() => { executeStatusChange(status); });
-            } else {
-                executeStatusChange(status);
+            // Αν πατήσει το ίδιο Status δεν γίνεται τίποτα
+            if (status === currentStatus) {
+                closeStatusPopup();
+                return;
             }
+
+            // Αν η ομπρέλα είναι ΗΔΗ σε «Κράτηση» ή «Κρ. Μαζί» και 
+            // προσπαθεί να της ΑΛΛΑΞΕΙ την κατάσταση
+            if (currentStatus === 'reserved' || currentStatus === 'together') {
+                if (globalUnlockState < 1) {
+                    requireAdmin(1, () => { executeStatusChange(status); });
+                    return;
+                }
+            }
+            
+            // Για όλες τις άλλες περιπτώσεις (ήταν ελεύθερη ή ήταν Ξενοδοχείο/Special/Χαλασμένη)
+            // η αλλαγή γίνεται άμεσα χωρίς κωδικό!
+            executeStatusChange(status);
         }
 
         function executeStatusChange(status) {
@@ -784,20 +729,16 @@
             } else {
                 setStatus(popupCurrentNum, status);
                 updatePopupStatusButtonsHighlight(status);
-                
-                // Αυτόματος συγχρονισμός βασικών στοιχείων στις συνδεδεμένες ομπρέλες
                 autoSyncLinkedCoreFields();
-                
-                // Αυτόματο κλείσιμο popup μετά από 600ms
                 setTimeout(() => closeStatusPopup(), 600);
             }
         }
 
-        // ── ΑΥΤΟΜΑΤΟΣ ΣΥΓΧΡΟΝΙΣΜΟΣ (Πελάτης, Υπάλληλος, Κατάσταση, Ποσό) ──
+        // ── ΑΥΤΟΜΑΤΟΣ ΣΥΓΧΡΟΝΙΣΜΟΣ ──
         function autoSyncLinkedCoreFields() {
             if (!popupCurrentNum) return;
             const linkedValue = document.getElementById('sp-linked').value;
-            if (!linkedValue.trim()) return; // Αν δεν έχει γράψει νούμερα, σταματάει εδώ
+            if (!linkedValue.trim()) return;
             
             const linkedUmbrellas = linkedValue.split(/[\s,]+/).filter(id => id.trim() !== '');
             const d = document.getElementById('globalDate').value;
@@ -887,22 +828,12 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('globalDate').value = today;
             
-            // Παρακολούθηση της κατάστασης του Admin Live
-            database.ref('admin_unlocked').on('value', snap => {
-                globalAdminAuthed = !!snap.val();
+            database.ref('admin_auth_level').on('value', snap => {
+                globalUnlockState = snap.val() || 0;
                 updateAdminButtonUI();
             });
 
             startLiveSync();
-            setInterval(() => {
-                database.ref('recovery').once('value', snap => {
-                    const data = snap.val() || {};
-                    const now = Date.now();
-                    Object.entries(data).forEach(([key, item]) => {
-                        if (item.expiresAt < now) database.ref('recovery/'+key).remove();
-                    });
-                });
-            }, 3600000);
         };
 
         function applyZoom(dir) {
@@ -948,7 +879,10 @@
             });
         }
 
-        function addNewCustomUmbrella() { requireAdmin(() => _addNewCustomUmbrella()); }
+        function addNewCustomUmbrella() { 
+            // Απαιτείται επίπεδο 2 (Ολικό)
+            requireAdmin(2, () => _addNewCustomUmbrella()); 
+        }
         function _addNewCustomUmbrella() {
             const num = prompt("Εισάγετε τον αριθμό της νέας ομπρέλας:");
             if (!num) return;
@@ -957,24 +891,21 @@
             database.ref('master_umbrellas/'+n).set({number:n});
         }
 
-        function deleteUmbrella(num) { requireAdmin(() => _deleteUmbrella(num)); }
+        function deleteUmbrella(num) { 
+            // Απαιτείται επίπεδο 2 (Ολικό)
+            requireAdmin(2, () => _deleteUmbrella(num)); 
+        }
         function _deleteUmbrella(num) {
             if (!confirm("Διαγραφή ομπρέλας "+num+" μόνιμα;")) return;
             const d = document.getElementById('globalDate').value;
-            const booking = (dailyBookings || {})[num] || {};
-            const recoveryData = {
-                num: num,
-                booking: booking,
-                date: d,
-                deletedAt: Date.now(),
-                expiresAt: Date.now() + 24*60*60*1000
-            };
-            database.ref('recovery/'+Date.now()).set(recoveryData);
             database.ref('master_umbrellas/'+num).remove();
             database.ref('bookings_by_date/'+d+'/'+num).remove();
         }
 
-        function clearDay() { requireAdmin(() => _clearDay()); }
+        function clearDay() { 
+            // Απαιτείται τουλάχιστον επίπεδο 1 (Μερικό)
+            requireAdmin(1, () => _clearDay()); 
+        }
         function _clearDay() {
             const d = document.getElementById('globalDate').value;
             showConfirm(
