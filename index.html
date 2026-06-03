@@ -24,6 +24,7 @@
             --purple:   #7c3aed;
             --danger:   #ef233c;
             --together: #92400e;
+            --vip:      #7c00ff; /* Χρυσό έντονο για Reserved εξωτερική */
             --free-col: #94a3b8;
             --bg:       #eef2f7;
             --surface:  #ffffff;
@@ -114,6 +115,9 @@
             display: flex; align-items: center;
             gap: 5px; flex-wrap: nowrap;
         }
+        .header-search-row {
+            display: flex; width: 100%; padding: 2px 0;
+        }
 
         .zoom-controls {
             display: flex; align-items: center; gap: 4px;
@@ -137,12 +141,12 @@
         }
         .zoom-label:hover { color: var(--primary); }
 
-        .stats-container { display: flex; flex-wrap: nowrap; gap: 3px; flex-shrink: 0; }
+        .stats-container { display: flex; flex-wrap: nowrap; gap: 3px; flex-shrink: 0; overflow-x: auto; }
         .stat-badge {
             background: #f1f5f9; border: 1px solid var(--border);
-            padding: 3px 7px; border-radius: 8px;
-            font-size: 10px; font-weight: 700;
-            display: flex; align-items: center; gap: 4px;
+            padding: 3px 5px; border-radius: 8px;
+            font-size: 9px; font-weight: 700;
+            display: flex; align-items: center; gap: 3px;
             cursor: pointer; transition: all 0.15s; user-select: none; white-space: nowrap;
         }
         .stat-badge:hover { border-color: #94a3b8; }
@@ -158,9 +162,10 @@
         .search-input:focus { border-color: var(--primary); background: #fff; }
 
         @media (min-width: 700px) {
-            header { flex-direction: row; align-items: center; padding: 5px 14px; gap: 10px; }
-            .header-row1 { flex: 0 0 auto; width: auto; overflow: visible; }
-            .header-row2 { flex: 1; min-width: 0; }
+            header { padding: 5px 14px; gap: 6px; }
+            .header-row1 { width: auto; overflow: visible; }
+            .header-row2 { flex: 0 0 auto; }
+            .header-search-row { flex: 0 0 auto; }
         }
 
         /* ── MAIN ── */
@@ -197,6 +202,7 @@
         .umbrella-card[data-status="special"]  { border-color: var(--purple);  box-shadow: 0 0 0 1px var(--purple);  }
         .umbrella-card[data-status="broken"]   { border-color: var(--warning); box-shadow: 0 0 0 1px var(--warning); }
         .umbrella-card[data-status="together"] { border-color: var(--together); box-shadow: 0 0 0 1px var(--together); }
+        .umbrella-card[data-status="vip"]      { border-color: var(--vip);      box-shadow: 0 0 0 2px var(--vip); }
 
         .delete-icon {
             position: absolute; top: 4px; right: 6px;
@@ -259,6 +265,7 @@
         .ov-special  { background: #c4b5fd; color: #3b0764; }
         .ov-broken   { background: #fcd34d; color: #78350f; }
         .ov-together { background: #d97706; color: #fff; }
+        .ov-vip      { background: #7c00ff; color: #fff; }
 
         /* ── OVERVIEW PANEL ── */
         #overview-panel {
@@ -319,6 +326,7 @@
         .sp-special  { background: #ede9fe; color: #7c3aed; border-color: #c4b5fd; }
         .sp-broken   { background: #fef3c7; color: #d97706; border-color: #fcd34d; }
         .sp-together { background: #fef3c7; color: #92400e; border-color: #d97706; }
+        .sp-vip      { background: #f3e8ff; color: #7c00ff; border-color: #7c00ff; font-weight:900; }
         .sp-close    { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; grid-column: 1/-1; font-weight: bold; font-size: 13px; margin-top: 5px; }
 
         /* ── CONFIRM MODAL ── */
@@ -341,7 +349,8 @@
 <body>
 
     <div id="status-popup" onclick="if(event.target===this)closeStatusPopup()">
-        <div class="status-popup-card">
+        <div class="status-popup-card" style="position:relative;">
+            <button onclick="closeStatusPopup()" style="position:sticky;top:0;float:right;z-index:10;background:#f1f5f9;border:none;font-size:34px;color:#64748b;cursor:pointer;line-height:1;padding:2px 10px;border-radius:8px;margin-bottom:-10px;">&times;</button>
             <div class="status-popup-title" id="status-popup-title">Ομπρέλα 000</div>
             <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
                 <div>
@@ -369,14 +378,24 @@
                 <input id="sp-notes2" type="text" placeholder="Extra σημειώσεις" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('notes2',this.value)">
                 
                 <input id="sp-linked" type="text" placeholder="🔗 Συνδεδεμένες ομπρέλες (π.χ. 102, 103)" onchange="autoSyncLinkedCoreFields()" style="padding:9px 12px;border:1.5px solid #bfdbfe;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;background:#f0f7ff;">
+                
+                <div id="together-type-selector" style="display:none; flex-direction:column; gap:6px;">
+                    <div style="font-size:10px;font-weight:700;color:#94a3b8;">ΤΥΠΟΣ ΚΡ. ΜΑΖΊ</div>
+                    <div style="display:flex;gap:6px;">
+                        <button class="together-type-btn" onclick="setTogetherType('reserved')" data-type="reserved" style="flex:1;padding:7px 4px;border-radius:8px;border:1.5px solid #fca5a5;background:#fee2e2;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">🔴 Κράτηση</button>
+                        <button class="together-type-btn" onclick="setTogetherType('hotel')" data-type="hotel" style="flex:1;padding:7px 4px;border-radius:8px;border:1.5px solid #93c5fd;background:#dbeafe;color:#1d6fe8;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">🏨 Ξενοδ.</button>
+                        <button class="together-type-btn" onclick="setTogetherType('special')" data-type="special" style="flex:1;padding:7px 4px;border-radius:8px;border:1.5px solid #c4b5fd;background:#ede9fe;color:#7c3aed;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">⭐ Special</button>
+                        <button class="together-type-btn" onclick="setTogetherType('vip')" data-type="vip" style="flex:1;padding:7px 4px;border-radius:8px;border:1.5px solid #f0c400;background:#fffbe6;color:#f0c400;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">🌟 Reserv.</button>
+                    </div>
+                </div>
             </div>
             <div class="status-popup-btns">
                 <button class="sp-btn sp-free"     onclick="setStatusFromPopup('free')">✅<br>Διαθ.</button>
                 <button class="sp-btn sp-reserved" onclick="setStatusFromPopup('reserved')">🔴<br>Κρατ.</button>
                 <button class="sp-btn sp-hotel"    onclick="setStatusFromPopup('hotel')">🏨<br>Ξεν.</button>
                 <button class="sp-btn sp-special"  onclick="setStatusFromPopup('special')">⭐<br>Special</button>
-                <button class="sp-btn sp-broken"   onclick="setStatusFromPopup('broken')">🔧<br>Χαλ.</button>
                 <button class="sp-btn sp-together" onclick="setStatusFromPopup('together')">Κρ. Μαζί</button>
+                <button class="sp-btn sp-vip"      onclick="setStatusFromPopup('vip')">🌟<br>Reserved</button>
                 <button class="sp-btn sp-close"    onclick="closeStatusPopup()">✕ Κλείσιμο</button>
             </div>
         </div>
@@ -444,6 +463,7 @@
                 <span class="zoom-label" id="zoom-label">100%</span>
                 <button class="zoom-btn" onclick="applyZoom(0.1)">+</button>
             </div>
+            <button id="admin-session-btn" onclick="toggleAdminSession()" style="background: var(--primary); color: white; border: none; padding: 6px 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 16px; margin-left: 4px; white-space: nowrap; line-height:1;">🔑</button>
             <div class="header-action-btns">
                 <button class="hdr-btn" id="admin-partial-btn" onclick="handlePartialBtnClick()" title="Μερικό Ξεκλείδωμα (Κράτηση/Κρ. Μαζί/Εκκαθάριση)">🔒</button>
                 <button class="hdr-btn" id="admin-master-btn" onclick="handleMasterBtnClick()" title="Πλήρες Ξεκλείδωμα Όλων (Master)">🔐</button>
@@ -469,14 +489,14 @@
                 <div class="stat-badge" id="badge-special" style="color:var(--purple)" onclick="setStatusFilter('special')">
                     Sp <span class="stat-num" id="stat-spec">0</span>
                 </div>
-                <div class="stat-badge" id="badge-broken" style="color:var(--warning)" onclick="setStatusFilter('broken')">
-                    Χαλ <span class="stat-num" id="stat-broken">0</span>
-                </div>
                 <div class="stat-badge" id="badge-together" style="color:var(--together)" onclick="setStatusFilter('together')">
-                    Κρ.Μαζί <span class="stat-num" id="stat-together">0</span>
+                    Κρ.Μ <span class="stat-num" id="stat-together">0</span>
+                </div>
+                <div class="stat-badge" id="badge-vip" style="color:#fff;background:#7c00ff;border-color:#6600dd;font-weight:900;" onclick="setStatusFilter('vip')">
+                    Res. <span class="stat-num" id="stat-vip">0</span>
                 </div>
             </div>
-            <input type="text" id="searchBar" class="search-input" placeholder="🔍 Νο ή Όνομα..." oninput="filterUmbrellas()">
+            <input type="text" id="searchBar" class="search-input" placeholder="🔍 Όνομα..." oninput="filterUmbrellas()" style="flex:1;min-width:60px;max-width:130px;">
         </div>
     </header>
 
@@ -496,8 +516,8 @@
             <div class="ov-legend-item"><div class="ov-legend-dot" style="background:#fca5a5"></div>Κρατ</div>
             <div class="ov-legend-item"><div class="ov-legend-dot" style="background:#93c5fd"></div>Ξεν</div>
             <div class="ov-legend-item"><div class="ov-legend-dot" style="background:#c4b5fd"></div>Sp</div>
-            <div class="ov-legend-item"><div class="ov-legend-dot" style="background:#fcd34d"></div>Χαλ</div>
             <div class="ov-legend-item"><div class="ov-legend-dot" style="background:#d97706"></div>Κρ.Μαζί</div>
+            <div class="ov-legend-item"><div class="ov-legend-dot" style="background:#7c00ff"></div>Res.</div>
         </div>
         <div id="overview-content"></div>
     </div>
@@ -554,10 +574,32 @@
         
         // ── AUTHENTICATION LEVELS LOGIC ──
         const ADMIN_PIN = '0852';
-        let globalUnlockState = 0; // 0 = Locked, 1 = Partial (Kράτηση/Κρ. Μαζί/Εκκαθάριση), 2 = Master (Τα πάντα)
+        const VIP_PIN = '9090'; // Ο ειδικός σου κωδικός για έλεγχο VIP
+        let isAdminLoggedIn = false; // Παραμένει τοπικά στη RAM της συσκευής
+        let globalUnlockState = 0; // 0 = Locked, 1 = Partial, 2 = Master
         
         let intendedUnlockTarget = null;
         let oneTimeCallback = null;
+
+        function toggleAdminSession() {
+            const btn = document.getElementById('admin-session-btn');
+            if (!isAdminLoggedIn) {
+                const inputPin = prompt("🔐 Εισάγετε τον κωδικό Διαχειριστή (VIP):");
+                if (inputPin === VIP_PIN) {
+                    isAdminLoggedIn = true;
+                    btn.textContent = "🔓";
+                    btn.style.background = "#18c45a";
+                    alert("✅ Συνδεθήκατε με επιτυχία! Έχετε πλήρη πρόσβαση στις VIP κρατήσεις.");
+                } else {
+                    alert("❌ Λάθος κωδικός πρόσβασης!");
+                }
+            } else {
+                isAdminLoggedIn = false;
+                btn.textContent = "🔑";
+                btn.style.background = "var(--primary)";
+                alert("🔒 Αποσυνδεθήκατε. Η εφαρμογή επέστρεψε σε λειτουργία απλού υπαλλήλου.");
+            }
+        }
 
         function updateAdminButtonUI() {
             const pBtn = document.getElementById('admin-partial-btn');
@@ -634,7 +676,6 @@
             }
         }
 
-
         let popupCurrentNum = null;
 
         function updatePopupStatusButtonsHighlight(status) {
@@ -644,7 +685,7 @@
                 btn.style.transform = 'none';
                 btn.style.border = '1.5px solid transparent';
             });
-            const map = { 'free': '.sp-free', 'reserved': '.sp-reserved', 'hotel': '.sp-hotel', 'special': '.sp-special', 'broken': '.sp-broken', 'together': '.sp-together' };
+            const map = { 'free': '.sp-free', 'reserved': '.sp-reserved', 'hotel': '.sp-hotel', 'special': '.sp-special', 'broken': '.sp-broken', 'together': '.sp-together', 'vip': '.sp-vip' };
             const activeBtn = document.querySelector('.status-popup-btns ' + map[status]);
             if (activeBtn) {
                 activeBtn.style.border = '2.5px solid #1e293b';
@@ -654,9 +695,15 @@
         }
 
         function openStatusPopup(num) {
+            const b = (dailyBookings || {})[num] || {};
+            // Ασφάλεια: Αν είναι VIP και δεν είσαι συνδεδεμένος Admin, απαγόρευσε το popup
+            if (b.status === 'vip' && !isAdminLoggedIn) {
+                alert("🔒 Αυτή είναι VIP Κράτηση. Μόνο ο Διαχειριστής μπορεί να την τροποποιήσει. Πατήστε 'Είσοδος Διαχειριστή' πάνω αριστερά.");
+                return;
+            }
+
             popupCurrentNum = num;
             document.getElementById('status-popup-title').textContent = 'Ομπρέλα ' + num;
-            const b = (dailyBookings || {})[num] || {};
             
             updatePopupStatusButtonsHighlight(b.status || 'free');
             
@@ -672,6 +719,15 @@
             document.getElementById('sp-notes2').value      = b.notes2      || '';
             document.getElementById('sp-linked').value      = '';
             
+            // Together type selector
+            const togetherSel = document.getElementById('together-type-selector');
+            if (b.status === 'together') {
+                togetherSel.style.display = 'flex';
+                updateTogetherTypeBtns(b.togetherType || '');
+            } else {
+                togetherSel.style.display = 'none';
+            }
+            
             // Ενημέρωση Κουμπιού Πληρωμής στο Popup
             const isPaid = b.isPaid === 'yes' || b.isPaid === true;
             const pBtn = document.getElementById('sp-payment-btn');
@@ -685,6 +741,12 @@
         function togglePaymentStatusFromPopup() {
             if (!popupCurrentNum) return;
             const b = (dailyBookings || {})[popupCurrentNum] || {};
+            
+            if (b.status === 'vip' && !isAdminLoggedIn) {
+                alert("🔒 Η ομπρέλα είναι κλειδωμένη ως VIP.");
+                return;
+            }
+
             const currentPaid = b.isPaid === 'yes' || b.isPaid === true;
             const newPaid = !currentPaid;
             
@@ -700,7 +762,10 @@
 
         function selectStaff(name) {
             if (!popupCurrentNum) return;
-            const currentStaff = (dailyBookings[popupCurrentNum] || {}).staff || '';
+            const b = dailyBookings[popupCurrentNum] || {};
+            if (b.status === 'vip' && !isAdminLoggedIn) return;
+
+            const currentStaff = b.staff || '';
             const newName = (currentStaff === name) ? '' : name;
             
             updatePopupField('staff', newName);
@@ -736,6 +801,12 @@
                 return;
             }
 
+            // Ασφάλεια: Αν επιλεχθεί να γίνει VIP, πρέπει να έχει προηγηθεί σύνδεση Admin
+            if (status === 'vip' && !isAdminLoggedIn) {
+                alert("❌ Δεν έχετε δικαίωμα να δημιουργήσετε VIP κράτηση. Συνδεθείτε πρώτα ως Διαχειριστής.");
+                return;
+            }
+
             if (currentStatus === 'reserved' || currentStatus === 'together') {
                 if (globalUnlockState < 1) {
                     requireAdmin(1, () => { executeStatusChange(status); });
@@ -755,15 +826,46 @@
                 });
                 closeStatusPopup();
             } else {
-                setStatus(popupCurrentNum, status);
+                // Αποθήκευση status μαζί με όλα τα πεδία του popup
+                const customer    = document.getElementById('sp-customer').value;
+                const time        = document.getElementById('sp-time').value;
+                const consumption = document.getElementById('sp-consumption').value;
+                const notes       = document.getElementById('sp-notes').value;
+                const notes2      = document.getElementById('sp-notes2').value;
+                const currentBooking = (dailyBookings || {})[popupCurrentNum] || {};
+                const staff          = currentBooking.staff || '';
+                const isPaid         = currentBooking.isPaid || false;
+
+                database.ref('bookings_by_date/' + d + '/' + popupCurrentNum).update({
+                    status: status,
+                    customer: customer,
+                    staff: staff,
+                    time: time,
+                    consumption: consumption,
+                    isPaid: isPaid,
+                    notes: notes,
+                    notes2: notes2
+                });
                 updatePopupStatusButtonsHighlight(status);
                 autoSyncLinkedCoreFields();
-                setTimeout(() => closeStatusPopup(), 600);
+                // Show/hide together type selector
+                const togetherSel = document.getElementById('together-type-selector');
+                if (status === 'together') {
+                    togetherSel.style.display = 'flex';
+                    updateTogetherTypeBtns((dailyBookings[popupCurrentNum] || {}).togetherType || '');
+                } else {
+                    togetherSel.style.display = 'none';
+                }
             }
         }
 
         function toggleCardPaymentStatus(num) {
             const b = dailyBookings[num] || {};
+            // Ασφάλεια: Απαγόρευση αλλαγής πληρωμής από την κάρτα αν είναι VIP
+            if (b.status === 'vip' && !isAdminLoggedIn) {
+                alert("🔒 Αυτή η ομπρέλα είναι κλειδωμένη ως VIP.");
+                return;
+            }
             const currentPaid = b.isPaid === 'yes' || b.isPaid === true;
             updateField(num, 'isPaid', !currentPaid);
         }
@@ -835,7 +937,7 @@
                 if (!rows[r]) rows[r] = [];
                 rows[r].push(u);
             });
-            const cls = { free:'ov-free', reserved:'ov-reserved', hotel:'ov-hotel', special:'ov-special', broken:'ov-broken', together:'ov-together' };
+            const cls = { free:'ov-free', reserved:'ov-reserved', hotel:'ov-hotel', special:'ov-special', broken:'ov-broken', together:'ov-together', vip:'ov-vip' };
             let html = '';
             Object.keys(rows).sort((a,b)=>a-b).forEach(r => {
                 html += `<div style="margin-bottom:8px;"><div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:3px;">ΣΕΙΡΑ ${r}</div><div style="display:flex;flex-wrap:wrap;gap:2px;">`;
@@ -892,7 +994,7 @@
         function setStatusFilter(status) {
             activeStatusFilter = status;
             document.querySelectorAll('.stat-badge').forEach(b => b.classList.remove('active'));
-            const map = {all:'badge-all',free:'badge-free',reserved:'badge-reserved',hotel:'badge-hotel',special:'badge-special',broken:'badge-broken',together:'badge-together'};
+            const map = {all:'badge-all',free:'badge-free',reserved:'badge-reserved',hotel:'badge-hotel',special:'badge-special',together:'badge-together',vip:'badge-vip'};
             if (map[status]) document.getElementById(map[status]).classList.add('active');
             renderDashboard();
         }
@@ -992,7 +1094,7 @@
             const wrapper = document.getElementById('zoom-wrapper');
             wrapper.innerHTML = '';
 
-            let total=0, occ=0, hotel=0, spec=0, broken=0, free=0, together=0;
+            let total=0, occ=0, hotel=0, spec=0, free=0, together=0, vip=0;
             const sorted = Object.keys(masterUmbrellasList).sort((a,b)=>parseInt(a)-parseInt(b));
 
             sorted.forEach(num => {
@@ -1000,8 +1102,8 @@
                 if (b.status==='reserved') occ++;
                 else if (b.status==='hotel') hotel++;
                 else if (b.status==='special') spec++;
-                else if (b.status==='broken') broken++;
                 else if (b.status==='together') together++;
+                else if (b.status==='vip') vip++;
                 else free++;
                 total++;
             });
@@ -1039,6 +1141,7 @@
                         case 'special':  fillColor='#7c3aed'; textColor='#fff';    bgTint='#f5f3ff'; break;
                         case 'broken':   fillColor='#f59e0b'; textColor='#1e293b'; bgTint='#fffbeb'; break;
                         case 'together': fillColor='#92400e'; textColor='#fff';    bgTint='#fef3c7'; break;
+                        case 'vip':      fillColor='#7c00ff'; textColor='#fff';    bgTint='#f3e8ff'; break;
                         default:         fillColor='#94a3b8'; textColor='#1e293b'; bgTint='#f8fafc';
                     }
 
@@ -1051,6 +1154,7 @@
 
                     card.innerHTML = `
                         <button class="delete-icon" onclick="deleteUmbrella('${num}')">&times;</button>
+                        ${b.status === 'together' && b.togetherType ? `<span style="position:absolute;top:4px;left:4px;font-size:8px;font-weight:800;padding:2px 5px;border-radius:5px;background:${b.togetherType==='reserved'?'#fee2e2':b.togetherType==='hotel'?'#dbeafe':b.togetherType==='special'?'#ede9fe':'#fffbe6'};color:${b.togetherType==='reserved'?'#dc2626':b.togetherType==='hotel'?'#1d6fe8':b.togetherType==='special'?'#7c3aed':'#f0c400'};line-height:1.4;">${b.togetherType==='reserved'?'Κρ 🔴':b.togetherType==='hotel'?'Ξεν 🏨':b.togetherType==='special'?'Sp ⭐':'Res 🌟'}</span>` : ''}
                         <div class="icon-box" onclick="openStatusPopup(${num})" style="cursor:pointer">
                             <span class="umb-number-badge" style="color:${textColor};">${num}</span>
                             <svg class="umbrella-svg" viewBox="0 0 100 100">
@@ -1087,16 +1191,48 @@
             document.getElementById('stat-occ').innerText = occ;
             document.getElementById('stat-hotel').innerText = hotel;
             document.getElementById('stat-spec').innerText = spec;
-            document.getElementById('stat-broken').innerText = broken;
             document.getElementById('stat-together').innerText = together;
+            document.getElementById('stat-vip').innerText = vip;
 
             enableDragScroll();
         }
 
         // ── FIREBASE FIELD UPDATE ──
         function updateField(num, field, val) {
+            const b = dailyBookings[num] || {};
+            // Ασφάλεια: Αν είναι VIP και δεν είσαι συνδεδεμένος Admin, ακύρωσε την πληκτρολόγηση
+            if (b.status === 'vip' && !isAdminLoggedIn) {
+                alert("🔒 Η ομπρέλα είναι κλειδωμένη ως VIP. Οι αλλαγές στα πεδία απαγορεύονται.");
+                renderDashboard(); // Re-render για να σβήσει ό,τι πρόλαβε να γράψει ο υπάλληλος
+                return;
+            }
             database.ref('bookings_by_date/'+document.getElementById('globalDate').value+'/'+num).update({[field]:val});
         }
+        function setTogetherType(type) {
+            if (!popupCurrentNum) return;
+            const b = (dailyBookings || {})[popupCurrentNum] || {};
+            const currentType = b.togetherType || '';
+            const newType = (currentType === type) ? '' : type;
+            updateField(popupCurrentNum, 'togetherType', newType);
+            updateTogetherTypeBtns(newType);
+        }
+
+        function updateTogetherTypeBtns(activeType) {
+            document.querySelectorAll('.together-type-btn').forEach(btn => {
+                const isActive = btn.getAttribute('data-type') === activeType;
+                btn.style.outline = isActive ? '2.5px solid #1e293b' : 'none';
+                btn.style.transform = isActive ? 'scale(1.05)' : 'scale(1)';
+            });
+        }
+
+        function toggleSearch() {
+            const row = document.getElementById('search-row');
+            const isVisible = row.style.display !== 'none';
+            row.style.display = isVisible ? 'none' : 'block';
+            if (!isVisible) document.getElementById('searchBar').focus();
+            if (isVisible) { document.getElementById('searchBar').value = ''; filterUmbrellas(); }
+        }
+
         function setStatus(num, status) {
             database.ref('bookings_by_date/'+document.getElementById('globalDate').value+'/'+num).update({status});
         }
