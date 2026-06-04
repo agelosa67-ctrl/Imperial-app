@@ -24,7 +24,7 @@
             --purple:   #7c3aed;
             --danger:   #ef233c;
             --together: #92400e;
-            --vip:      #E9AB17; /* Χρυσό έντονο για Reserved εξωτερική */
+            --vip:      #ff00aa; /* Neon Φούξια για Reserved */
             --free-col: #94a3b8;
             --bg:       #eef2f7;
             --surface:  #ffffff;
@@ -202,7 +202,13 @@
         .umbrella-card[data-status="special"]  { border-color: var(--purple);  box-shadow: 0 0 0 1px var(--purple);  }
         .umbrella-card[data-status="broken"]   { border-color: var(--warning); box-shadow: 0 0 0 1px var(--warning); }
         .umbrella-card[data-status="together"] { border-color: var(--together); box-shadow: 0 0 0 1px var(--together); }
-        .umbrella-card[data-status="vip"]      { border-color: var(--vip);      box-shadow: 0 0 0 2px var(--vip); }
+        .umbrella-card[data-status="vip"]      { border-color: var(--vip); animation: vipPulse 1.4s ease-in-out infinite; }
+
+        @keyframes vipPulse {
+            0%   { box-shadow: 0 0 6px 2px #ff00aa99, 0 0 0 2px #ff00aa; }
+            50%  { box-shadow: 0 0 22px 8px #ff00aacc, 0 0 0 2px #ff00aa; }
+            100% { box-shadow: 0 0 6px 2px #ff00aa99, 0 0 0 2px #ff00aa; }
+        }
 
         .delete-icon {
             position: absolute; top: 4px; right: 6px;
@@ -265,7 +271,7 @@
         .ov-special  { background: #c4b5fd; color: #3b0764; }
         .ov-broken   { background: #fcd34d; color: #78350f; }
         .ov-together { background: #d97706; color: #fff; }
-        .ov-vip      { background: #E9AB17; color: #1a0a00; }
+        .ov-vip      { background: #ff00aa; color: #fff; }
 
         /* ── OVERVIEW PANEL ── */
         #overview-panel {
@@ -326,7 +332,7 @@
         .sp-special  { background: #ede9fe; color: #7c3aed; border-color: #c4b5fd; }
         .sp-broken   { background: #fef3c7; color: #d97706; border-color: #fcd34d; }
         .sp-together { background: #fef3c7; color: #92400e; border-color: #d97706; }
-        .sp-vip      { background: #E9AB17; color: #1a0a00; border-color: #c8920e; font-weight:900; }
+        .sp-vip      { background: #ff00aa; color: #fff; border-color: #cc0088; font-weight:900; animation: vipPulse 1.4s ease-in-out infinite; }
         .sp-close    { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; grid-column: 1/-1; font-weight: bold; font-size: 13px; margin-top: 5px; }
 
         /* ── CONFIRM MODAL ── */
@@ -385,7 +391,7 @@
                         <button class="together-type-btn" onclick="setTogetherType('reserved')" data-type="reserved" style="flex:1;padding:7px 4px;border-radius:8px;border:1.5px solid #fca5a5;background:#fee2e2;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">🔴 Κράτηση</button>
                         <button class="together-type-btn" onclick="setTogetherType('hotel')" data-type="hotel" style="flex:1;padding:7px 4px;border-radius:8px;border:1.5px solid #93c5fd;background:#dbeafe;color:#1d6fe8;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">🏨 Ξενοδ.</button>
                         <button class="together-type-btn" onclick="setTogetherType('special')" data-type="special" style="flex:1;padding:7px 4px;border-radius:8px;border:1.5px solid #c4b5fd;background:#ede9fe;color:#7c3aed;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">⭐ Special</button>
-                        <button class="together-type-btn" onclick="setTogetherType('vip')" data-type="vip" style="flex:1;padding:7px 4px;border-radius:8px;border:1.5px solid #c8920e;background:#E9AB17;color:#1a0a00;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">🌟 Reserv.</button>
+                        <button class="together-type-btn" onclick="setTogetherType('vip')" data-type="vip" style="flex:1;padding:7px 4px;border-radius:8px;border:1.5px solid #cc0088;background:#ff00aa;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">🌟 Reserv.</button>
                     </div>
                 </div>
             </div>
@@ -492,7 +498,7 @@
                 <div class="stat-badge" id="badge-together" style="color:var(--together)" onclick="setStatusFilter('together')">
                     Κρ.Μ <span class="stat-num" id="stat-together">0</span>
                 </div>
-                <div class="stat-badge" id="badge-vip" style="color:#1a0a00;background:#E9AB17;border-color:#c8920e;font-weight:900;" onclick="setStatusFilter('vip')">
+                <div class="stat-badge" id="badge-vip" style="color:#fff;background:#ff00aa;border-color:#cc0088;font-weight:900;animation:vipPulse 1.4s ease-in-out infinite;" onclick="setStatusFilter('vip')">
                     Res. <span class="stat-num" id="stat-vip">0</span>
                 </div>
             </div>
@@ -517,7 +523,7 @@
             <div class="ov-legend-item"><div class="ov-legend-dot" style="background:#93c5fd"></div>Ξεν</div>
             <div class="ov-legend-item"><div class="ov-legend-dot" style="background:#c4b5fd"></div>Sp</div>
             <div class="ov-legend-item"><div class="ov-legend-dot" style="background:#d97706"></div>Κρ.Μαζί</div>
-            <div class="ov-legend-item"><div class="ov-legend-dot" style="background:#E9AB17"></div>Res.</div>
+            <div class="ov-legend-item"><div class="ov-legend-dot" style="background:#ff00aa"></div>Res.</div>
         </div>
         <div id="overview-content"></div>
     </div>
@@ -1141,7 +1147,7 @@
                         case 'special':  fillColor='#7c3aed'; textColor='#fff';    bgTint='#f5f3ff'; break;
                         case 'broken':   fillColor='#f59e0b'; textColor='#1e293b'; bgTint='#fffbeb'; break;
                         case 'together': fillColor='#92400e'; textColor='#fff';    bgTint='#fef3c7'; break;
-                        case 'vip':      fillColor='#E9AB17'; textColor='#1a0a00';    bgTint='#fff8e6'; break;
+                        case 'vip':      fillColor='#ff00aa'; textColor='#fff';    bgTint='#fff0f8'; break;
                         default:         fillColor='#94a3b8'; textColor='#1e293b'; bgTint='#f8fafc';
                     }
 
@@ -1154,7 +1160,7 @@
 
                     card.innerHTML = `
                         <button class="delete-icon" onclick="deleteUmbrella('${num}')">&times;</button>
-                        ${b.status === 'together' && b.togetherType ? `<span style="position:absolute;top:4px;left:4px;font-size:8px;font-weight:800;padding:2px 5px;border-radius:5px;background:${b.togetherType==='reserved'?'#fee2e2':b.togetherType==='hotel'?'#dbeafe':b.togetherType==='special'?'#ede9fe':'#fff8e6'};color:${b.togetherType==='reserved'?'#dc2626':b.togetherType==='hotel'?'#1d6fe8':b.togetherType==='special'?'#7c3aed':'#E9AB17'};line-height:1.4;">${b.togetherType==='reserved'?'Κρ 🔴':b.togetherType==='hotel'?'Ξεν 🏨':b.togetherType==='special'?'Sp ⭐':'Res 🌟'}</span>` : ''}
+                        ${b.status === 'together' && b.togetherType ? `<span style="position:absolute;top:4px;left:4px;font-size:8px;font-weight:800;padding:2px 5px;border-radius:5px;background:${b.togetherType==='reserved'?'#fee2e2':b.togetherType==='hotel'?'#dbeafe':b.togetherType==='special'?'#ede9fe':'#ffe0f5'};color:${b.togetherType==='reserved'?'#dc2626':b.togetherType==='hotel'?'#1d6fe8':b.togetherType==='special'?'#7c3aed':'#ff00aa'};line-height:1.4;">${b.togetherType==='reserved'?'Κρ 🔴':b.togetherType==='hotel'?'Ξεν 🏨':b.togetherType==='special'?'Sp ⭐':'Res 🌟'}</span>` : ''}
                         <div class="icon-box" onclick="openStatusPopup(${num})" style="cursor:pointer">
                             <span class="umb-number-badge" style="color:${textColor};">${num}</span>
                             <svg class="umbrella-svg" viewBox="0 0 100 100">
@@ -1222,14 +1228,14 @@
         }
 
         function updateTogetherTypeBtns(activeType) {
-            const fills   = {reserved:'#dc2626', hotel:'#1d6fe8', special:'#7c3aed', vip:'#E9AB17'};
-            const lights  = {reserved:'#fee2e2', hotel:'#dbeafe', special:'#ede9fe', vip:'#fff8e6'};
-            const texts   = {reserved:'#dc2626', hotel:'#1d6fe8', special:'#7c3aed', vip:'#1a0a00'};
+            const fills   = {reserved:'#dc2626', hotel:'#1d6fe8', special:'#7c3aed', vip:'#ff00aa'};
+            const lights  = {reserved:'#fee2e2', hotel:'#dbeafe', special:'#ede9fe', vip:'#ffe0f5'};
+            const texts   = {reserved:'#dc2626', hotel:'#1d6fe8', special:'#7c3aed', vip:'#ff00aa'};
             document.querySelectorAll('.together-type-btn').forEach(btn => {
                 const t = btn.getAttribute('data-type');
                 const isActive = t === activeType;
                 btn.style.background  = isActive ? fills[t]  : lights[t];
-                btn.style.color       = isActive ? (t==='vip'?'#1a0a00':'#fff') : texts[t];
+                btn.style.color       = isActive ? (t==='vip'?'#fff':'#fff') : texts[t];
                 btn.style.border      = isActive ? `2px solid ${fills[t]}` : `1.5px solid ${fills[t]}88`;
                 btn.style.transform   = isActive ? 'scale(1.05)' : 'scale(1)';
                 btn.style.boxShadow   = isActive ? `0 0 8px ${fills[t]}99` : 'none';
