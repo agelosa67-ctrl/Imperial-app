@@ -786,7 +786,7 @@
             pBtn.style.background = newPaid ? '#dcfce7' : '#f8fafc';
             pBtn.style.borderColor = newPaid ? '#16a34a' : '#cbd5e1';
             
-            autoSyncLinkedCoreFields();
+            if (b.status === 'together') autoSyncLinkedCoreFields();
         }
 
         function selectStaff(name) {
@@ -803,7 +803,7 @@
                 btn.classList.toggle('selected', btn.textContent === newName);
             });
             
-            autoSyncLinkedCoreFields();
+            if (b.status === 'together') autoSyncLinkedCoreFields();
         }
 
         function updatePopupField(field, value) {
@@ -813,7 +813,10 @@
         
         function closeStatusPopup() {
             if (popupCurrentNum) {
-                autoSyncLinkedCoreFields();
+                const b = (dailyBookings || {})[popupCurrentNum] || {};
+                if (b.status === 'together') {
+                    autoSyncLinkedCoreFields();
+                }
             }
             document.getElementById('status-popup').classList.remove('open');
             popupCurrentNum = null;
@@ -850,8 +853,22 @@
             const d = document.getElementById('globalDate').value;
             
             if (status === 'free') {
+                // Πριν γίνει free, αφαίρεσε τον αριθμό από τις linked ομπρέλες
+                const oldBooking = dailyBookings[popupCurrentNum] || {};
+                if (oldBooking.linkedNums) {
+                    const sisters = oldBooking.linkedNums.split(/[\s,]+/).filter(n => n.trim() !== '');
+                    sisters.forEach(sNum => {
+                        const sBook = dailyBookings[sNum] || {};
+                        if (sBook.linkedNums) {
+                            const updatedLinked = sBook.linkedNums.split(/[\s,]+/)
+                                .filter(n => n.trim() !== '' && String(n) !== String(popupCurrentNum))
+                                .join(' ');
+                            database.ref('bookings_by_date/' + d + '/' + sNum).update({ linkedNums: updatedLinked });
+                        }
+                    });
+                }
                 database.ref('bookings_by_date/' + d + '/' + popupCurrentNum).set({
-                    status: 'free', customer: '', staff: '', time: '', consumption: '', isPaid: false, notes: '', notes2: ''
+                    status: 'free', customer: '', staff: '', time: '', consumption: '', isPaid: false, notes: '', notes2: '', linkedNums: ''
                 });
                 closeStatusPopup();
             } else {
@@ -876,7 +893,27 @@
                     notes2: notes2
                 });
                 updatePopupStatusButtonsHighlight(status);
-                autoSyncLinkedCoreFields();
+                
+                // Sync μόνο αν παραμένει together — αλλιώς αφαίρεσε από τις sisters
+                if (status === 'together') {
+                    autoSyncLinkedCoreFields();
+                } else {
+                    // Αλλαγή σε άλλο status (πχ reserved, hotel) — αφαίρεσε μόνο από linkedNums των sisters
+                    const oldBooking = (dailyBookings || {})[popupCurrentNum] || {};
+                    if (oldBooking.linkedNums) {
+                        const sisters = oldBooking.linkedNums.split(/[\s,]+/).filter(n => n.trim() !== '');
+                        sisters.forEach(sNum => {
+                            const sBook = dailyBookings[sNum] || {};
+                            if (sBook.linkedNums) {
+                                const updatedLinked = sBook.linkedNums.split(/[\s,]+/)
+                                    .filter(n => n.trim() !== '' && String(n) !== String(popupCurrentNum))
+                                    .join(' ');
+                                database.ref('bookings_by_date/' + d + '/' + sNum).update({ linkedNums: updatedLinked });
+                            }
+                        });
+                    }
+                    database.ref('bookings_by_date/' + d + '/' + popupCurrentNum).update({ linkedNums: '' });
+                }
                 // Show/hide together type selector
                 const togetherSel = document.getElementById('together-type-selector');
                 if (status === 'together') {
