@@ -369,7 +369,7 @@
                     </div>
                     <div id="sp-staff-display" style="font-size:11px;color:#1d6fe8;font-weight:700;margin-top:4px;min-height:16px;"></div>
                 </div>
-                <input id="sp-customer" type="text" placeholder="Όνομα πελάτη" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('customer',this.value)">
+                <input id="sp-customer" type="text" placeholder="Όνομα πελάτη" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;">
                 <input id="sp-time" type="text" placeholder="Ώρα" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('time',this.value)">
                 
                 <div style="position:relative; width:100%; display:flex; align-items:center; gap:8px;">
@@ -383,7 +383,10 @@
                 <input id="sp-notes" type="text" placeholder="Σημειώσεις" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('notes',this.value)">
                 <input id="sp-notes2" type="text" placeholder="Extra σημειώσεις" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('notes2',this.value)">
                 
-                <input id="sp-linked" type="text" placeholder="🔗 Συνδεδεμένες ομπρέλες (π.χ. 102, 103)" onchange="autoSyncLinkedCoreFields()" style="padding:9px 12px;border:1.5px solid #bfdbfe;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;background:#f0f7ff;">
+                <div style="position:relative;width:100%;">
+                    <input id="sp-linked" type="text" placeholder="🔗 Συνδεδεμένες ομπρέλες (π.χ. 208 308)" oninput="onLinkedInput(this.value)" onchange="autoSyncLinkedCoreFields()" style="padding:9px 12px;border:1.5px solid #bfdbfe;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;background:#f0f7ff;">
+                    <div id="sp-linked-preview" style="display:none;margin-top:6px;padding:8px 10px;background:#f0f7ff;border:1.5px solid #bfdbfe;border-radius:10px;font-size:11px;color:#1e40af;font-weight:700;line-height:1.6;"></div>
+                </div>
                 
                 <div id="together-type-selector" style="display:none; flex-direction:column; gap:6px;">
                     <div style="font-size:10px;font-weight:700;color:#94a3b8;">ΤΥΠΟΣ ΚΡ. ΜΑΖΊ</div>
@@ -724,6 +727,26 @@
             document.getElementById('sp-notes').value       = b.notes       || '';
             document.getElementById('sp-notes2').value      = b.notes2      || '';
             document.getElementById('sp-linked').value      = '';
+            document.getElementById('sp-linked-preview').style.display = 'none';
+            
+            // Πρώτα από αποθηκευμένο linkedNums, αλλιώς υπολόγισε από customer
+            if (b.status === 'together') {
+                const storedLinked = b.linkedNums || '';
+                const autoLinked = storedLinked || (b.customer ? getLinkedNums(num, b.customer) : '');
+                document.getElementById('sp-linked').value = autoLinked;
+                if (autoLinked) updateLinkedPreview(autoLinked);
+            }
+            
+            // Live ανανέωση linked όταν αλλάζει το όνομα
+            document.getElementById('sp-customer').oninput = function() {
+                updatePopupField('customer', this.value);
+                const currentStatus = (dailyBookings[popupCurrentNum] || {}).status || '';
+                if (currentStatus === 'together') {
+                    const autoLinked = getLinkedNums(popupCurrentNum, this.value);
+                    document.getElementById('sp-linked').value = autoLinked;
+                    updateLinkedPreview(autoLinked);
+                }
+            };
             
             // Together type selector
             const togetherSel = document.getElementById('together-type-selector');
@@ -876,6 +899,48 @@
             updateField(num, 'isPaid', !currentPaid);
         }
 
+        // ── ΒΟΗΘΗΤΙΚΗ: Βρες αριθμούς ομπρελών που έχουν ίδιο customer & status together ──
+        function getLinkedNums(excludeNum, customer) {
+            if (!customer || !customer.trim()) return '';
+            const cust = customer.trim().toLowerCase();
+            const result = [];
+            Object.keys(dailyBookings).forEach(n => {
+                const ob = dailyBookings[n];
+                if (String(n) === String(excludeNum)) return;
+                if (ob.status !== 'together') return;
+                if (!ob.customer) return;
+                if (ob.customer.trim().toLowerCase() === cust) result.push(parseInt(n));
+            });
+            result.sort((a,b) => a - b);
+            return result.join(' · ');
+        }
+
+        // ── Όταν αλλάζει το linked field live ──
+        function onLinkedInput(val) {
+            updateLinkedPreview(val);
+        }
+
+        function updateLinkedPreview(val) {
+            const preview = document.getElementById('sp-linked-preview');
+            const nums = val.split(/[\s,]+/).filter(n => n.trim() !== '');
+            if (!nums.length) { preview.style.display = 'none'; return; }
+            let html = '🔗 Συνδεδεμένες:<br>';
+            let allFound = true;
+            nums.forEach(n => {
+                const b = dailyBookings[n];
+                if (b) {
+                    const typeLabel = b.togetherType === 'reserved' ? '🔴 Κρ' : b.togetherType === 'hotel' ? '🏨 Ξεν' : b.togetherType === 'special' ? '⭐ Sp' : b.togetherType === 'vip' ? '🌟 Res' : '';
+                    const statusLabel = b.status === 'together' ? typeLabel || '↔' : b.status === 'reserved' ? '🔴' : b.status === 'hotel' ? '🏨' : b.status === 'free' ? '✅ Ελεύθερη' : b.status;
+                    html += `<span style="display:inline-block;background:#dbeafe;border-radius:5px;padding:1px 6px;margin:2px;">Νο${n} ${statusLabel} ${b.customer ? '— '+b.customer : ''}</span> `;
+                } else {
+                    html += `<span style="display:inline-block;background:#fee2e2;border-radius:5px;padding:1px 6px;margin:2px;color:#dc2626;">Νο${n} ❌ Δεν βρέθηκε</span> `;
+                    allFound = false;
+                }
+            });
+            preview.innerHTML = html;
+            preview.style.display = 'block';
+        }
+
         // ── ΑΥΤΟΜΑΤΟΣ ΣΥΓΧΡΟΝΙΣΜΟΣ ──
         function autoSyncLinkedCoreFields() {
             if (!popupCurrentNum) return;
@@ -892,19 +957,27 @@
             const status         = currentBooking.status || 'free';
             const staff          = currentBooking.staff || '';
             const isPaid         = currentBooking.isPaid || false;
+            const togetherType   = currentBooking.togetherType || '';
 
-            linkedUmbrellas.forEach(num => {
-                if (masterUmbrellasList[num]) {
-                    database.ref('bookings_by_date/' + d + '/' + num).update({
-                        status: status,
-                        customer: customer,
-                        staff: staff,
-                        consumption: consumption,
-                        isPaid: isPaid,
-                        time: time
-                    });
-                }
+            // Όλοι οι αριθμοί της ομάδας (η τρέχουσα + οι linked)
+            const allNums = [String(popupCurrentNum), ...linkedUmbrellas.map(n => String(n))];
+
+            // Κάθε ομπρέλα αποθηκεύει τους ΑΛΛΟΥΣ ως linkedNums
+            allNums.forEach(num => {
+                if (!masterUmbrellasList[num]) return;
+                const othersNums = allNums.filter(n => n !== num).join(' ');
+                database.ref('bookings_by_date/' + d + '/' + num).update({
+                    status: status,
+                    customer: customer,
+                    staff: staff,
+                    consumption: consumption,
+                    isPaid: isPaid,
+                    time: time,
+                    togetherType: togetherType,
+                    linkedNums: othersNums
+                });
             });
+            updateLinkedPreview(linkedValue);
         }
 
         function safeEvalConsumption(val) {
@@ -1158,6 +1231,10 @@
                     card.setAttribute('data-name', (b.customer||'').toLowerCase());
                     card.style.background = bgTint;
 
+                    const linkedDisplay = (b.status === 'together')
+                        ? (b.linkedNums || (b.customer ? getLinkedNums(num, b.customer) : ''))
+                        : '';
+
                     card.innerHTML = `
                         <button class="delete-icon" onclick="deleteUmbrella('${num}')">&times;</button>
                         ${b.status === 'together' && b.togetherType ? `<span style="position:absolute;top:4px;left:4px;font-size:8px;font-weight:800;padding:2px 5px;border-radius:5px;background:${b.togetherType==='reserved'?'#fee2e2':b.togetherType==='hotel'?'#dbeafe':b.togetherType==='special'?'#ede9fe':'#ffe0f5'};color:${b.togetherType==='reserved'?'#dc2626':b.togetherType==='hotel'?'#1d6fe8':b.togetherType==='special'?'#7c3aed':'#ff00aa'};line-height:1.4;">${b.togetherType==='reserved'?'Κρ 🔴':b.togetherType==='hotel'?'Ξεν 🏨':b.togetherType==='special'?'Sp ⭐':'Res 🌟'}</span>` : ''}
@@ -1171,6 +1248,7 @@
                                 <path d="M 44 88 Q 50 96 56 88" stroke="#334155" stroke-width="3" fill="none" stroke-linecap="round"/>
                             </svg>
                         </div>
+                        ${b.status === 'together' ? `<div style="font-size:8px;font-weight:800;color:#92400e;background:#fef3c7;border-radius:5px;padding:2px 4px;margin-bottom:2px;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">↔ ${linkedDisplay || '—'}</div>` : ''}
                         <div class="inputs-form">
                             <input class="card-inline-field card-customer-field" placeholder="Πελάτης" value="${b.customer||''}" onchange="updateField('${num}','customer',this.value)" onclick="event.stopPropagation()" style="font-weight:700; border-bottom: 1px dashed #cbd5e1;">
                             <input class="card-inline-field card-staff-field" placeholder="Υπαλ." value="${b.staff||''}" onchange="updateField('${num}','staff',this.value)" onclick="event.stopPropagation()">
@@ -1223,8 +1301,20 @@
                 const pin = prompt('🔒 Κωδικός για Reserved:');
                 if (pin !== VIP_PIN) { alert('Λάθος κωδικός!'); return; }
             }
-            database.ref('bookings_by_date/'+document.getElementById('globalDate').value+'/'+popupCurrentNum).update({togetherType: newType});
+            const d = document.getElementById('globalDate').value;
+            database.ref('bookings_by_date/'+d+'/'+popupCurrentNum).update({togetherType: newType});
             updateTogetherTypeBtns(newType);
+
+            // Sync togetherType σε όλες τις linked ομπρέλες
+            const linkedValue = document.getElementById('sp-linked').value;
+            if (linkedValue.trim()) {
+                const linkedUmbrellas = linkedValue.split(/[\s,]+/).filter(id => id.trim() !== '');
+                linkedUmbrellas.forEach(num => {
+                    if (masterUmbrellasList[num]) {
+                        database.ref('bookings_by_date/'+d+'/'+num).update({togetherType: newType});
+                    }
+                });
+            }
         }
 
         function updateTogetherTypeBtns(activeType) {
