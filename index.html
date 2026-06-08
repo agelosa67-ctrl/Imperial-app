@@ -354,6 +354,18 @@
 </head>
 <body>
 
+    <!-- Global Min Consumption Popup -->
+    <div id="min-cons-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:9999;align-items:center;justify-content:center;" onclick="if(event.target===this)closeMinConsPopup()">
+        <div style="background:#fff;border-radius:18px;padding:16px;width:220px;box-shadow:0 10px 40px rgba(0,0,0,0.25);">
+            <div style="font-size:11px;font-weight:800;color:#94a3b8;text-align:center;margin-bottom:12px;letter-spacing:1px;">ΥΠΟΧΡ. ΚΑΤΑΝΑΛΩΣΗ</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;" id="min-cons-btns"></div>
+            <div id="min-cons-paid-btn" style="display:none;">
+                <button onclick="toggleMinConsFromPopup()" style="width:100%;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:800;cursor:pointer;"></button>
+            </div>
+            <button onclick="closeMinConsPopup()" style="width:100%;border:none;border-radius:10px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;background:#f1f5f9;color:#64748b;margin-top:6px;">Κλείσιμο</button>
+        </div>
+    </div>
+
     <div id="status-popup" onclick="if(event.target===this)closeStatusPopup()">
         <div class="status-popup-card" style="position:relative;">
             <button onclick="closeStatusPopup()" style="position:sticky;top:0;float:right;z-index:10;background:#f1f5f9;border:none;font-size:34px;color:#64748b;cursor:pointer;line-height:1;padding:2px 10px;border-radius:8px;margin-bottom:-10px;">&times;</button>
@@ -1301,16 +1313,9 @@
                         </div>
                         <!-- Min badge -->
                         <div style="position:absolute;right:2px;top:52px;z-index:30;">
-                            <button ontouchstart="event.stopPropagation();event.preventDefault();toggleMinConsDropdown('${num}',this);" onclick="event.stopPropagation();event.preventDefault();toggleMinConsDropdown('${num}',this);" style="display:block;border:none;border-radius:10px;padding:4px 6px;font-size:9px;font-weight:800;cursor:pointer;background:${b.minConsumption ? (b.minConsPaid ? '#16a34a' : '#ef4444') : 'rgba(148,163,184,0.35)'};color:${b.minConsumption ? '#fff' : '#94a3b8'};line-height:1.3;text-align:center;min-width:34px;box-shadow:0 2px 6px rgba(0,0,0,0.15);touch-action:manipulation;">
+                            <button onclick="event.stopPropagation();openMinConsPopup('${num}')" style="display:block;border:none;border-radius:10px;padding:4px 6px;font-size:9px;font-weight:800;cursor:pointer;background:${b.minConsumption ? (b.minConsPaid ? '#16a34a' : '#ef4444') : 'rgba(148,163,184,0.35)'};color:${b.minConsumption ? '#fff' : '#94a3b8'};line-height:1.3;text-align:center;min-width:34px;box-shadow:0 2px 6px rgba(0,0,0,0.15);">
                                 ${b.minConsumption ? `${b.minConsumption}€<br>${b.minConsPaid ? '✅' : '⭕'}` : 'Min<br>＋'}
                             </button>
-                            <div id="mincons-drop-${num}" style="display:none;position:fixed;background:#fff;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,0.22);padding:8px;z-index:9999;min-width:150px;">
-                                <div style="font-size:9px;font-weight:700;color:#94a3b8;margin-bottom:6px;text-align:center;">ΥΠΟΧΡ. ΚΑΤΑΝΑΛΩΣΗ</div>
-                                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;">
-                                    ${[5,10,20,40,50].map(v=>`<button ontouchstart="event.stopPropagation();tapMinCons('${num}',${v})" onclick="tapMinCons('${num}',${v})" style="border:none;border-radius:8px;padding:8px 2px;font-size:12px;font-weight:800;cursor:pointer;touch-action:manipulation;background:${b.minConsumption==v ? (b.minConsPaid?'#16a34a':'#ef4444') : '#f0fdf4'};color:${b.minConsumption==v?'#fff':'#16a34a'};">${v}€</button>`).join('')}
-                                    <button ontouchstart="event.stopPropagation();setMinConsCard('${num}',0)" onclick="setMinConsCard('${num}',0)" style="border:none;border-radius:8px;padding:8px 2px;font-size:12px;font-weight:800;cursor:pointer;touch-action:manipulation;background:#fee2e2;color:#dc2626;">✕</button>
-                                </div>
-                            </div>
                         </div>
                         ${b.status === 'together' ? `<div style="font-size:8px;font-weight:800;color:#92400e;background:#fef3c7;border-radius:5px;padding:2px 4px;margin-bottom:2px;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">↔ ${linkedDisplay || '—'}</div>` : ''}
                         <div class="inputs-form">
@@ -1389,6 +1394,43 @@
                     }
                 });
             }, 50);
+        }
+
+        let minConsCurrentNum = null;
+
+        function openMinConsPopup(num) {
+            minConsCurrentNum = num;
+            const b = dailyBookings[num] || {};
+            const popup = document.getElementById('min-cons-popup');
+            const btnsDiv = document.getElementById('min-cons-btns');
+            const paidDiv = document.getElementById('min-cons-paid-btn');
+
+            btnsDiv.innerHTML = [5,10,20,40,50].map(v => `
+                <button onclick="tapMinCons('${num}',${v})" style="border:none;border-radius:10px;padding:10px 2px;font-size:14px;font-weight:800;cursor:pointer;background:${b.minConsumption==v ? (b.minConsPaid?'#16a34a':'#ef4444') : '#f0fdf4'};color:${b.minConsumption==v?'#fff':'#16a34a'};">${v}€</button>
+            `).join('') + `<button onclick="setMinConsCard('${num}',0)" style="border:none;border-radius:10px;padding:10px 2px;font-size:14px;font-weight:800;cursor:pointer;background:#fee2e2;color:#dc2626;">✕</button>`;
+
+            if (b.minConsumption) {
+                paidDiv.style.display = 'block';
+                const btn = paidDiv.querySelector('button');
+                btn.style.background = b.minConsPaid ? '#16a34a' : '#ef4444';
+                btn.style.color = '#fff';
+                btn.textContent = b.minConsPaid ? '✅ Πληρώθηκε' : '⭕ Δεν πληρώθηκε';
+            } else {
+                paidDiv.style.display = 'none';
+            }
+
+            popup.style.display = 'flex';
+        }
+
+        function closeMinConsPopup() {
+            document.getElementById('min-cons-popup').style.display = 'none';
+            minConsCurrentNum = null;
+        }
+
+        function toggleMinConsFromPopup() {
+            if (!minConsCurrentNum) return;
+            toggleMinCons(minConsCurrentNum);
+            setTimeout(() => openMinConsPopup(minConsCurrentNum), 300);
         }
 
         function tapMinCons(num, val) {
