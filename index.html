@@ -382,6 +382,19 @@
 
                 <input id="sp-notes" type="text" placeholder="Σημειώσεις" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('notes',this.value)">
                 <input id="sp-notes2" type="text" placeholder="Extra σημειώσεις" style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;" oninput="updatePopupField('notes2',this.value)">
+
+                <div>
+                    <div style="font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:6px;">ΥΠΟΧΡΕΩΤΙΚΗ ΚΑΤΑΝΑΛΩΣΗ</div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                        <button onclick="setMinConsumption(5)"  class="min-cons-btn" data-val="5"  style="flex:1;padding:8px 4px;border-radius:9px;border:1.5px solid #bbf7d0;background:#f0fdf4;color:#16a34a;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">5€</button>
+                        <button onclick="setMinConsumption(10)" class="min-cons-btn" data-val="10" style="flex:1;padding:8px 4px;border-radius:9px;border:1.5px solid #bbf7d0;background:#f0fdf4;color:#16a34a;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">10€</button>
+                        <button onclick="setMinConsumption(20)" class="min-cons-btn" data-val="20" style="flex:1;padding:8px 4px;border-radius:9px;border:1.5px solid #bbf7d0;background:#f0fdf4;color:#16a34a;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">20€</button>
+                        <button onclick="setMinConsumption(40)" class="min-cons-btn" data-val="40" style="flex:1;padding:8px 4px;border-radius:9px;border:1.5px solid #bbf7d0;background:#f0fdf4;color:#16a34a;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">40€</button>
+                        <button onclick="setMinConsumption(50)" class="min-cons-btn" data-val="50" style="flex:1;padding:8px 4px;border-radius:9px;border:1.5px solid #bbf7d0;background:#f0fdf4;color:#16a34a;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">50€</button>
+                        <button onclick="setMinConsumption(0)"  class="min-cons-btn" data-val="0"  style="flex:1;padding:8px 4px;border-radius:9px;border:1.5px solid #fecaca;background:#fff1f2;color:#dc2626;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">✕</button>
+                    </div>
+                    <div id="sp-min-cons-display" style="font-size:11px;color:#16a34a;font-weight:800;margin-top:4px;min-height:16px;"></div>
+                </div>
                 
                 <div style="position:relative;width:100%;">
                     <input id="sp-linked" type="text" placeholder="🔗 Συνδεδεμένες ομπρέλες (π.χ. 208 308)" oninput="onLinkedInput(this.value)" onchange="autoSyncLinkedCoreFields()" style="padding:9px 12px;border:1.5px solid #bfdbfe;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;background:#f0f7ff;">
@@ -726,6 +739,7 @@
             updatePopupConsumptionTotal(b.consumption || '');
             document.getElementById('sp-notes').value       = b.notes       || '';
             document.getElementById('sp-notes2').value      = b.notes2      || '';
+            updateMinConsBtns(b.minConsumption || '');
             document.getElementById('sp-linked').value      = '';
             document.getElementById('sp-linked-preview').style.display = 'none';
             
@@ -1275,7 +1289,7 @@
                     card.innerHTML = `
                         <button class="delete-icon" onclick="deleteUmbrella('${num}')">&times;</button>
                         ${b.status === 'together' && b.togetherType ? `<span style="position:absolute;top:4px;left:4px;font-size:8px;font-weight:800;padding:2px 5px;border-radius:5px;background:${b.togetherType==='reserved'?'#fee2e2':b.togetherType==='hotel'?'#dbeafe':b.togetherType==='special'?'#ede9fe':'#ffe0f5'};color:${b.togetherType==='reserved'?'#dc2626':b.togetherType==='hotel'?'#1d6fe8':b.togetherType==='special'?'#7c3aed':'#ff00aa'};line-height:1.4;">${b.togetherType==='reserved'?'Κρ 🔴':b.togetherType==='hotel'?'Ξεν 🏨':b.togetherType==='special'?'Sp ⭐':'Res 🌟'}</span>` : ''}
-                        <div class="icon-box" onclick="openStatusPopup(${num})" style="cursor:pointer">
+                        <div class="icon-box" onclick="openStatusPopup(${num})" style="cursor:pointer;position:relative;">
                             <span class="umb-number-badge" style="color:${textColor};">${num}</span>
                             <svg class="umbrella-svg" viewBox="0 0 100 100">
                                 <path d="M 10 52 Q 50 5 90 52 Z" fill="${fillColor}"/>
@@ -1284,6 +1298,19 @@
                                 <rect x="48" y="52" width="4" height="38" fill="#334155" rx="2"/>
                                 <path d="M 44 88 Q 50 96 56 88" stroke="#334155" stroke-width="3" fill="none" stroke-linecap="round"/>
                             </svg>
+                        </div>
+                        <!-- Min badge -->
+                        <div style="position:absolute;right:2px;top:52px;z-index:30;">
+                            <button ontouchstart="event.stopPropagation();event.preventDefault();toggleMinConsDropdown('${num}',this);" onclick="event.stopPropagation();event.preventDefault();toggleMinConsDropdown('${num}',this);" style="display:block;border:none;border-radius:10px;padding:4px 6px;font-size:9px;font-weight:800;cursor:pointer;background:${b.minConsumption ? (b.minConsPaid ? '#16a34a' : '#ef4444') : 'rgba(148,163,184,0.35)'};color:${b.minConsumption ? '#fff' : '#94a3b8'};line-height:1.3;text-align:center;min-width:34px;box-shadow:0 2px 6px rgba(0,0,0,0.15);touch-action:manipulation;">
+                                ${b.minConsumption ? `${b.minConsumption}€<br>${b.minConsPaid ? '✅' : '⭕'}` : 'Min<br>＋'}
+                            </button>
+                            <div id="mincons-drop-${num}" style="display:none;position:fixed;background:#fff;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,0.22);padding:8px;z-index:9999;min-width:150px;">
+                                <div style="font-size:9px;font-weight:700;color:#94a3b8;margin-bottom:6px;text-align:center;">ΥΠΟΧΡ. ΚΑΤΑΝΑΛΩΣΗ</div>
+                                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;">
+                                    ${[5,10,20,40,50].map(v=>`<button ontouchstart="event.stopPropagation();tapMinCons('${num}',${v})" onclick="tapMinCons('${num}',${v})" style="border:none;border-radius:8px;padding:8px 2px;font-size:12px;font-weight:800;cursor:pointer;touch-action:manipulation;background:${b.minConsumption==v ? (b.minConsPaid?'#16a34a':'#ef4444') : '#f0fdf4'};color:${b.minConsumption==v?'#fff':'#16a34a'};">${v}€</button>`).join('')}
+                                    <button ontouchstart="event.stopPropagation();setMinConsCard('${num}',0)" onclick="setMinConsCard('${num}',0)" style="border:none;border-radius:8px;padding:8px 2px;font-size:12px;font-weight:800;cursor:pointer;touch-action:manipulation;background:#fee2e2;color:#dc2626;">✕</button>
+                                </div>
+                            </div>
                         </div>
                         ${b.status === 'together' ? `<div style="font-size:8px;font-weight:800;color:#92400e;background:#fef3c7;border-radius:5px;padding:2px 4px;margin-bottom:2px;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">↔ ${linkedDisplay || '—'}</div>` : ''}
                         <div class="inputs-form">
@@ -1329,8 +1356,97 @@
             }
             database.ref('bookings_by_date/'+document.getElementById('globalDate').value+'/'+num).update({[field]:val});
         }
-        function setTogetherType(type) {
+        function toggleMinConsDropdown(num, btn) {
+            document.querySelectorAll('[id^="mincons-drop-"]').forEach(d => {
+                if (d.id !== 'mincons-drop-' + num) d.style.display = 'none';
+            });
+            const drop = document.getElementById('mincons-drop-' + num);
+            if (!drop) return;
+            if (drop.style.display !== 'none') { drop.style.display = 'none'; return; }
+
+            const rect = btn.getBoundingClientRect();
+            drop.style.display = 'block';
+            const dropW = 158;
+            let left = rect.left;
+            if (left + dropW > window.innerWidth) left = window.innerWidth - dropW - 8;
+            drop.style.left = left + 'px';
+            drop.style.top = (rect.bottom + 6) + 'px';
+            if (rect.bottom + 180 > window.innerHeight) {
+                drop.style.top = (rect.top - 180) + 'px';
+            }
+
+            setTimeout(() => {
+                document.addEventListener('touchstart', function closeDrop(e) {
+                    if (!drop.contains(e.target) && e.target !== btn) {
+                        drop.style.display = 'none';
+                        document.removeEventListener('touchstart', closeDrop);
+                    }
+                });
+                document.addEventListener('click', function closeDrop2(e) {
+                    if (!drop.contains(e.target) && e.target !== btn) {
+                        drop.style.display = 'none';
+                        document.removeEventListener('click', closeDrop2);
+                    }
+                });
+            }, 50);
+        }
+
+        function tapMinCons(num, val) {
+            const d = document.getElementById('globalDate').value;
+            const b = dailyBookings[num] || {};
+            const current = parseInt(b.minConsumption) || 0;
+            const isPaid = b.minConsPaid || false;
+
+            if (current === 0) {
+                // Δεν είχε τιμή → βάλε την, κόκκινο
+                database.ref('bookings_by_date/' + d + '/' + num).update({ minConsumption: val, minConsPaid: false });
+            } else if (current === val && !isPaid) {
+                // Ίδιος αριθμός, κόκκινο → πράσινο
+                database.ref('bookings_by_date/' + d + '/' + num).update({ minConsPaid: true });
+            } else if (current === val && isPaid) {
+                // Ίδιος αριθμός, πράσινο → κόκκινο
+                database.ref('bookings_by_date/' + d + '/' + num).update({ minConsPaid: false });
+            } else {
+                // Διαφορετικός αριθμός → πρόσθεσε
+                database.ref('bookings_by_date/' + d + '/' + num).update({ minConsumption: current + val, minConsPaid: false });
+            }
+            document.getElementById('mincons-drop-' + num).style.display = 'none';
+        }
+
+        function setMinConsCard(num, val) {
+            const d = document.getElementById('globalDate').value;
+            database.ref('bookings_by_date/' + d + '/' + num).update({ minConsumption: val || '', minConsPaid: false });
+            document.getElementById('mincons-drop-' + num).style.display = 'none';
+        }
+
+        function toggleMinCons(num) {
+            const d = document.getElementById('globalDate').value;
+            const b = dailyBookings[num] || {};
+            const newVal = !b.minConsPaid;
+            database.ref('bookings_by_date/' + d + '/' + num).update({ minConsPaid: newVal });
+        }
+
+        function setMinConsumption(val) {
             if (!popupCurrentNum) return;
+            const d = document.getElementById('globalDate').value;
+            const minVal = val > 0 ? val : '';
+            database.ref('bookings_by_date/' + d + '/' + popupCurrentNum).update({ minConsumption: minVal });
+            updateMinConsBtns(minVal);
+        }
+
+        function updateMinConsBtns(val) {
+            document.querySelectorAll('.min-cons-btn').forEach(btn => {
+                const bVal = parseInt(btn.getAttribute('data-val'));
+                const isActive = val && parseInt(val) === bVal;
+                btn.style.background   = isActive ? '#16a34a' : (bVal === 0 ? '#fff1f2' : '#f0fdf4');
+                btn.style.color        = isActive ? '#fff'    : (bVal === 0 ? '#dc2626' : '#16a34a');
+                btn.style.borderColor  = isActive ? '#16a34a' : (bVal === 0 ? '#fecaca' : '#bbf7d0');
+            });
+            const disp = document.getElementById('sp-min-cons-display');
+            disp.textContent = val ? '✓ Υποχρ. κατανάλωση: ' + val + '€' : '';
+        }
+
+        function setTogetherType(type) {
             const b = (dailyBookings || {})[popupCurrentNum] || {};
             const currentType = b.togetherType || '';
             const newType = (currentType === type) ? '' : type;
