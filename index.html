@@ -459,6 +459,27 @@
         </div>
     </div>
 
+    <!-- ── GROUP PANEL ── -->
+    <div id="group-panel" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:600;flex-direction:column;overflow:hidden;">
+        <div style="background:var(--surface);padding:10px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,0.07);flex-shrink:0;">
+            <button onclick="closeGroupPanel()" style="background:#f1f5f9;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text);">← Πίσω</button>
+            <div style="flex:1;">
+                <div id="group-panel-title" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--text);">ΟΜΑΔΑ</div>
+                <div id="group-panel-sub" style="font-size:11px;color:var(--muted);font-weight:600;"></div>
+            </div>
+            <div id="group-panel-summary" style="text-align:right;font-size:12px;font-weight:800;"></div>
+        </div>
+        <div style="background:var(--surface);padding:6px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);flex-shrink:0;">
+            <span style="font-size:11px;color:var(--muted);font-weight:700;">ΜΕΓΕΘΟΣ:</span>
+            <button onclick="groupZoom(-0.1)" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:#f1f5f9;font-size:16px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
+            <span id="group-zoom-label" style="font-size:12px;font-weight:800;color:var(--primary);min-width:38px;text-align:center;">85%</span>
+            <button onclick="groupZoom(0.1)" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:#f1f5f9;font-size:16px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
+        </div>
+        <div style="flex:1;overflow:auto;padding:16px;">
+            <div id="group-panel-cards" style="display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start;transform-origin:top left;transition:transform 0.2s;"></div>
+        </div>
+    </div>
+
     <div id="pin-overlay">
         <div class="pin-logo">Imperial Beach<small>MANAGEMENT SUITE</small></div>
         <div class="pin-card">
@@ -1320,7 +1341,7 @@
                                 ${b.minConsumption ? `${b.minConsumption}€<br>${b.minConsPaid ? '✅' : '⭕'}` : 'Min<br>＋'}
                             </button>
                         </div>
-                        ${b.status === 'together' ? `<div style="font-size:8px;font-weight:800;color:#92400e;background:#fef3c7;border-radius:5px;padding:2px 4px;margin-bottom:2px;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">↔ ${linkedDisplay || '—'}</div>` : ''}
+                        ${b.status === 'together' ? `<div onclick="event.stopPropagation();openGroupPanel('${num}')" style="font-size:8px;font-weight:800;color:#92400e;background:#fef3c7;border:1.5px solid #d97706;border-radius:5px;padding:2px 6px;margin-bottom:2px;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;active:opacity(0.7);">🔗 ${linkedDisplay || '—'}</div>` : ''}
                         <div class="inputs-form">
                             <input class="card-inline-field card-customer-field" placeholder="Πελάτης" value="${b.customer||''}" onchange="updateField('${num}','customer',this.value)" onclick="event.stopPropagation()" style="font-weight:700; border-bottom: 1px dashed #cbd5e1;">
                             <input class="card-inline-field card-staff-field" placeholder="Υπαλ." value="${b.staff||''}" onchange="updateField('${num}','staff',this.value)" onclick="event.stopPropagation()">
@@ -1558,6 +1579,143 @@
         function setStatus(num, status) {
             database.ref('bookings_by_date/'+document.getElementById('globalDate').value+'/'+num).update({status});
         }
+        function openGroupPanel(mainNum) {
+            const b = (dailyBookings || {})[mainNum] || {};
+            let linkedRaw = b.linkedNums || (b.customer ? getLinkedNums(mainNum, b.customer) : '');
+            const linkedNums = linkedRaw.split(/[\s·,]+/).map(n => n.trim()).filter(n => n !== '');
+            const allNums = [String(mainNum), ...linkedNums];
+
+            // Τίτλος
+            document.getElementById('group-panel-title').textContent = '🔗 ΟΜΑΔΑ ' + allNums.join(' · ');
+            document.getElementById('group-panel-sub').textContent = b.customer ? '👤 ' + b.customer : '';
+
+            // Summary + Pay All button
+            const totalCons = allNums.reduce((s, n) => s + safeEvalConsumption((dailyBookings[n]||{}).consumption), 0);
+            const paidCount = allNums.filter(n => { const bk=dailyBookings[n]||{}; return bk.isPaid==='yes'||bk.isPaid===true; }).length;
+            const sumEl = document.getElementById('group-panel-summary');
+            const allPaid = paidCount === allNums.length;
+            sumEl.innerHTML = `
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="text-align:right;">
+                        <div style="color:${allPaid?'#16a34a':'#ef4444'};font-size:13px;font-weight:800;">${allPaid?'✅ Όλες':'⭕ '+paidCount+'/'+allNums.length}</div>
+                        ${totalCons?'<div style="color:#92400e;font-size:12px;font-weight:800;">'+totalCons+'€</div>':''}
+                    </div>
+                    <button onclick="payAllGroup('${mainNum}')" style="background:${allPaid?'#dcfce7':'#ef4444'};color:${allPaid?'#16a34a':'#fff'};border:none;border-radius:10px;padding:8px 12px;font-size:11px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;">
+                        ${allPaid ? '✅ Πληρώθηκαν' : '💰 Πληρωμή\nΌλων'}
+                    </button>
+                </div>
+            `;
+
+            // Κάρτες
+            const container = document.getElementById('group-panel-cards');
+            container.innerHTML = '';
+
+            allNums.forEach(n => {
+                const bk = (dailyBookings || {})[n] || {};
+                const isPaid = bk.isPaid === 'yes' || bk.isPaid === true;
+                const isMain = String(n) === String(mainNum);
+                const consTotal = safeEvalConsumption(bk.consumption);
+
+                let fillColor, bgTint;
+                switch(bk.status) {
+                    case 'reserved': fillColor='#ef233c'; bgTint='#fff1f2'; break;
+                    case 'hotel':    fillColor='#1a6bff'; bgTint='#eff6ff'; break;
+                    case 'special':  fillColor='#7c3aed'; bgTint='#f5f3ff'; break;
+                    case 'broken':   fillColor='#f59e0b'; bgTint='#fffbeb'; break;
+                    case 'together': fillColor='#92400e'; bgTint='#fef3c7'; break;
+                    case 'vip':      fillColor='#ff00aa'; bgTint='#fff0f8'; break;
+                    default:         fillColor='#94a3b8'; bgTint='#f8fafc';
+                }
+
+                const card = document.createElement('div');
+                card.style.cssText = `background:${bgTint};border:2.5px solid ${isMain?'#d97706':fillColor};border-radius:12px;padding:8px 8px 10px;width:110px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:${isMain?'0 0 0 3px #fcd34d55':'0 2px 8px rgba(0,0,0,0.07)'};position:relative;cursor:pointer;`;
+
+                // Κλικ στην κάρτα → επεξεργασία (εκτός από τα κουμπιά)
+                card.onclick = () => { closeGroupPanel(); openStatusPopup(n); };
+
+                card.innerHTML = `
+                    ${isMain ? '<div style="position:absolute;top:5px;left:5px;background:#d97706;color:#fff;font-size:7px;font-weight:900;padding:1px 5px;border-radius:4px;letter-spacing:0.5px;">ΑΥΤΗ</div>' : ''}
+                    
+                    <!-- Ομπρέλα + Min badge δίπλα -->
+                    <div style="position:relative;width:100%;display:flex;justify-content:center;align-items:flex-end;margin-top:${isMain?'10px':'2px'};">
+                        <div style="position:relative;width:62px;height:54px;flex-shrink:0;">
+                            <span style="position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;z-index:2;text-shadow:0 1px 4px rgba(0,0,0,0.3);white-space:nowrap;">${n}</span>
+                            <svg viewBox="0 0 100 100" style="width:100%;height:100%;">
+                                <path d="M 10 52 Q 50 5 90 52 Z" fill="${fillColor}"/>
+                                <path d="M 10 52 Q 50 5 90 52" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+                                <path d="M 30 38 Q 50 12 70 38" fill="rgba(255,255,255,0.18)"/>
+                                <rect x="48" y="52" width="4" height="38" fill="#334155" rx="2"/>
+                                <path d="M 44 88 Q 50 96 56 88" stroke="#334155" stroke-width="3" fill="none" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        ${bk.minConsumption ? `
+                        <div onclick="event.stopPropagation();openMinConsPopup('${n}')" style="position:absolute;right:0;bottom:4px;border:none;border-radius:8px;padding:3px 5px;font-size:8px;font-weight:800;cursor:pointer;background:${bk.minConsPaid?'#16a34a':'#ef4444'};color:#fff;line-height:1.3;text-align:center;min-width:30px;box-shadow:0 2px 5px rgba(0,0,0,0.18);">
+                            ${bk.minConsumption}€<br>${bk.minConsPaid?'✅':'⭕'}
+                        </div>` : ''}
+                    </div>
+
+                    <div style="width:100%;font-size:11px;font-weight:700;text-align:center;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${bk.customer||'—'}</div>
+                    ${bk.staff ? `<div style="font-size:9px;color:#64748b;text-align:center;">👤 ${bk.staff}</div>` : ''}
+                    ${bk.time  ? `<div style="font-size:9px;color:#64748b;text-align:center;">⏰ ${bk.time}</div>` : ''}
+                    <div style="width:100%;text-align:center;font-size:11px;font-weight:800;color:${isPaid?'#16a34a':'#ef4444'};">
+                        ${bk.consumption ? (consTotal ? consTotal+'€' : bk.consumption) : '<span style="color:#94a3b8;font-weight:400;font-size:10px;">—</span>'}
+                    </div>
+                    <!-- Κουμπί πληρωμής μικρό -->
+                    <button onclick="event.stopPropagation();toggleGroupCardPayment('${n}', '${mainNum}')" style="width:100%;border:1.5px solid ${isPaid?'#16a34a':'#cbd5e1'};background:${isPaid?'#dcfce7':'#f8fafc'};border-radius:8px;padding:5px 4px;font-size:12px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;color:${isPaid?'#16a34a':'#94a3b8'};">
+                        ${isPaid ? '✅' : '⭕'}
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+
+            document.getElementById('group-panel').style.display = 'flex';
+            // Apply current zoom
+            const el = document.getElementById('group-panel-cards');
+            el.style.transform = `scale(${groupZoomLevel})`;
+            el.style.transformOrigin = 'top left';
+            document.getElementById('group-zoom-label').textContent = Math.round(groupZoomLevel * 100) + '%';
+        }
+
+        let groupZoomLevel = 0.85;
+        function groupZoom(delta) {
+            groupZoomLevel = Math.min(2, Math.max(0.4, groupZoomLevel + delta));
+            const el = document.getElementById('group-panel-cards');
+            el.style.transform = `scale(${groupZoomLevel})`;
+            el.style.transformOrigin = 'top left';
+            el.parentElement.style.height = Math.ceil(el.scrollHeight * groupZoomLevel + 32) + 'px';
+            document.getElementById('group-zoom-label').textContent = Math.round(groupZoomLevel * 100) + '%';
+        }
+
+        function closeGroupPanel() {
+            document.getElementById('group-panel').style.display = 'none';
+        }
+
+        function payAllGroup(mainNum) {
+            const b = (dailyBookings || {})[mainNum] || {};
+            let linkedRaw = b.linkedNums || (b.customer ? getLinkedNums(mainNum, b.customer) : '');
+            const linkedNums = linkedRaw.split(/[\s·,]+/).map(n => n.trim()).filter(n => n !== '');
+            const allNums = [String(mainNum), ...linkedNums];
+            const allPaid = allNums.every(n => { const bk=dailyBookings[n]||{}; return bk.isPaid==='yes'||bk.isPaid===true; });
+            const d = document.getElementById('globalDate').value;
+            allNums.forEach(n => {
+                if ((dailyBookings[n]||{}).status === 'vip' && !isAdminLoggedIn) return;
+                database.ref('bookings_by_date/' + d + '/' + n).update({ isPaid: !allPaid });
+            });
+            setTimeout(() => openGroupPanel(mainNum), 300);
+        }
+
+        function toggleGroupCardPayment(num, mainNum) {
+            const bk = (dailyBookings || {})[num] || {};
+            if (bk.status === 'vip' && !isAdminLoggedIn) {
+                alert('🔒 Αυτή η ομπρέλα είναι κλειδωμένη ως VIP.');
+                return;
+            }
+            const currentPaid = bk.isPaid === 'yes' || bk.isPaid === true;
+            const d = document.getElementById('globalDate').value;
+            database.ref('bookings_by_date/' + d + '/' + num).update({ isPaid: !currentPaid });
+            setTimeout(() => openGroupPanel(mainNum), 250);
+        }
+
         function filterUmbrellas() {
             const q = document.getElementById('searchBar').value.toLowerCase().trim();
             document.querySelectorAll('.umbrella-card').forEach(c => {
