@@ -335,6 +335,12 @@
         .sp-vip      { background: #ff00aa; color: #fff; border-color: #cc0088; font-weight:900; animation: vipPulse 1.4s ease-in-out infinite; }
         .sp-close    { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; grid-column: 1/-1; font-weight: bold; font-size: 13px; margin-top: 5px; }
 
+        /* ── Αποτρέπει iOS auto-zoom όταν πληκτρολογείς σε inputs ── */
+        #status-popup input,
+        #min-cons-popup input {
+            font-size: 16px !important;
+        }
+
         /* ── CONFIRM MODAL ── */
         #confirm-modal { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55); backdrop-filter: blur(4px); z-index: 900; align-items: center; justify-content: center; }
         #confirm-modal.open { display: flex; }
