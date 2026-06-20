@@ -341,6 +341,58 @@
             font-size: 16px !important;
         }
 
+        /* ── STAFF PANEL ── */
+        #staff-panel {
+            display: none; position: fixed; inset: 0; background: var(--bg);
+            z-index: 600; flex-direction: column; overflow: hidden;
+        }
+        #staff-panel.open { display: flex; }
+        .staff-panel-topbar {
+            background: var(--surface); padding: 10px 14px;
+            display: flex; align-items: center; gap: 10px;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07); flex-shrink: 0;
+        }
+        .staff-panel-body { flex: 1; overflow: auto; padding: 14px 16px; }
+        .staff-select-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+        .staff-select-card {
+            background: var(--surface); border: 2px solid var(--border);
+            border-radius: 14px; padding: 12px 20px; cursor: pointer;
+            font-size: 15px; font-weight: 700; transition: all 0.15s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .staff-select-card:hover { border-color: var(--primary); background: #eff6ff; }
+        .staff-select-card.active { border-color: var(--primary); background: #eff6ff; color: var(--primary); }
+        .staff-results-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--border);
+        }
+        .staff-result-row {
+            background: var(--surface); border-radius: 12px; padding: 10px 14px;
+            margin-bottom: 8px; border: 1.5px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
+            cursor: pointer; transition: all 0.12s;
+        }
+        .staff-result-row:hover { border-color: #94a3b8; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+        .staff-result-num {
+            font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+            min-width: 48px; text-align: center;
+        }
+        .staff-result-info { flex: 1; }
+        .staff-result-customer { font-size: 13px; font-weight: 700; color: var(--text); }
+        .staff-result-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+        .staff-result-amount { font-size: 14px; font-weight: 800; text-align: right; }
+        .staff-total-box {
+            background: #1e3a8a; color: #fff; border-radius: 14px; padding: 14px 18px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px;
+        }
+        .status-pill {
+            display: inline-block; font-size: 9px; font-weight: 800;
+            padding: 2px 7px; border-radius: 20px; margin-left: 4px;
+            vertical-align: middle;
+        }
+
         /* ── CONFIRM MODAL ── */
         #confirm-modal { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55); backdrop-filter: blur(4px); z-index: 900; align-items: center; justify-content: center; }
         #confirm-modal.open { display: flex; }
@@ -453,6 +505,35 @@
         </div>
     </div>
 
+    <!-- ── STAFF PANEL ── -->
+    <div id="staff-panel">
+        <div class="staff-panel-topbar">
+            <button onclick="closeStaffPanel()" style="background:#f1f5f9;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text);">← Πίσω</button>
+            <div style="flex:1;">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--text);">👤 ΥΠΑΛΛΗΛΟΙ</div>
+                <div id="staff-panel-date" style="font-size:11px;color:var(--muted);font-weight:600;"></div>
+            </div>
+        </div>
+        <div class="staff-panel-body">
+            <div class="staff-select-grid" id="staff-select-grid">
+                <!-- dynamically filled -->
+            </div>
+            <div id="staff-results-container" style="display:none;">
+                <div class="staff-total-box" id="staff-total-box"></div>
+                <div class="staff-results-header">
+                    <div id="staff-results-title" style="font-size:13px;font-weight:800;color:var(--text);"></div>
+                    <div id="staff-results-count" style="font-size:11px;color:var(--muted);font-weight:700;"></div>
+                </div>
+                <div id="staff-results-list"></div>
+            </div>
+            <div id="staff-empty-msg" style="display:none;text-align:center;padding:40px 20px;color:var(--muted);">
+                <div style="font-size:36px;margin-bottom:10px;">🔍</div>
+                <div style="font-size:14px;font-weight:700;">Δεν βρέθηκαν κρατήσεις</div>
+                <div style="font-size:12px;margin-top:4px;">Ο υπάλληλος δεν έχει κρατήσεις σήμερα</div>
+            </div>
+        </div>
+    </div>
+
     <div id="confirm-modal">
         <div class="confirm-card">
             <div class="confirm-icon">🗑️</div>
@@ -530,8 +611,9 @@
                 <button class="hdr-btn" id="admin-partial-btn" onclick="handlePartialBtnClick()" title="Μερικό Ξεκλείδωμα (Κράτηση/Κρ. Μαζί/Εκκαθάριση)">🔒</button>
                 <button class="hdr-btn" id="admin-master-btn" onclick="handleMasterBtnClick()" title="Πλήρες Ξεκλείδωμα Όλων (Master)">🔐</button>
                 <button class="hdr-btn secondary" onclick="addNewCustomUmbrella()" title="Νέα ομπρέλα">+</button>
+                <button class="hdr-btn overview-btn" id="staff-panel-btn" onclick="toggleStaffPanel()" title="Υπάλληλοι">👤</button>
                 <button class="hdr-btn overview-btn" id="overview-btn" onclick="toggleOverview()" title="Χάρτης">🗺</button>
-                <button class="hdr-btn danger-clear" onclick="clearDay()" title="Εκκαθάριση" style="font-size:9px;padding:3px 5px;">🗑</button>
+                <button class="hdr-btn danger-clear" onclick="clearDay()" title="Εκκαθάριση" style="font-size:13px;padding:6px 10px;font-weight:900;background:#fee2e2;color:#b91c1c;border-color:#fca5a5;min-width:36px;">🗑</button>
             </div>
         </div>
         <div class="header-row2">
@@ -1720,6 +1802,179 @@
             const d = document.getElementById('globalDate').value;
             database.ref('bookings_by_date/' + d + '/' + num).update({ isPaid: !currentPaid });
             setTimeout(() => openGroupPanel(mainNum), 250);
+        }
+
+        // ── STAFF PANEL ────────────────────────────────────────────
+        const STAFF_NAMES = ['Edisa', 'Ananias', 'Savvas', 'Sidorela'];
+        let staffPanelOpen = false;
+        let selectedStaffMember = null;
+
+        function toggleStaffPanel() {
+            staffPanelOpen = !staffPanelOpen;
+            const panel = document.getElementById('staff-panel');
+            const btn = document.getElementById('staff-panel-btn');
+            panel.classList.toggle('open', staffPanelOpen);
+            btn.classList.toggle('active', staffPanelOpen);
+            if (staffPanelOpen) initStaffPanel();
+        }
+
+        function closeStaffPanel() {
+            staffPanelOpen = false;
+            // ΔΕΝ μηδενίζουμε το staffPanelUnlocked — μένει ξεκλείδωτο όσο η εφαρμογή είναι ανοιχτή
+            document.getElementById('staff-panel').classList.remove('open');
+            document.getElementById('staff-panel-btn').classList.remove('active');
+            selectedStaffMember = null;
+        }
+
+        function initStaffPanel() {
+            const d = document.getElementById('globalDate').value;
+            document.getElementById('staff-panel-date').textContent = '📅 ' + d;
+            document.getElementById('staff-results-container').style.display = 'none';
+            document.getElementById('staff-empty-msg').style.display = 'none';
+
+            const grid = document.getElementById('staff-select-grid');
+            grid.innerHTML = '';
+            STAFF_NAMES.forEach(name => {
+                // count bookings for quick badge
+                const count = Object.values(dailyBookings || {}).filter(b =>
+                    b.staff === name && b.status && b.status !== 'free' && b.status !== 'hotel' && b.status !== 'broken'
+                ).length;
+                const card = document.createElement('div');
+                card.className = 'staff-select-card' + (selectedStaffMember === name ? ' active' : '');
+                card.innerHTML = `👤 ${name} <span style="background:#dbeafe;color:#1d4ed8;border-radius:20px;padding:2px 8px;font-size:11px;">${count}</span>`;
+                card.onclick = () => showStaffResults(name);
+                grid.appendChild(card);
+            });
+
+            if (selectedStaffMember) showStaffResults(selectedStaffMember);
+        }
+
+        function showStaffResults(staffName) {
+            selectedStaffMember = staffName;
+            // update active card
+            document.querySelectorAll('.staff-select-card').forEach(c => {
+                c.classList.toggle('active', c.textContent.includes(staffName));
+            });
+
+            const bk = dailyBookings || {};
+            // Gather bookings: exclude hotel (ξενοδοχείο) and free/broken
+            const EXCLUDED = ['free', 'hotel', 'broken'];
+            const results = [];
+            const seen = new Set();
+
+            Object.entries(bk).forEach(([num, b]) => {
+                if (!b.staff || b.staff !== staffName) return;
+                if (EXCLUDED.includes(b.status)) return;
+                if (seen.has(num)) return;
+                seen.add(num);
+                results.push({ num, b });
+            });
+
+            // Sort by umbrella number
+            results.sort((a, z) => parseInt(a.num) - parseInt(z.num));
+
+            const container = document.getElementById('staff-results-container');
+            const emptyMsg = document.getElementById('staff-empty-msg');
+            const list = document.getElementById('staff-results-list');
+            list.innerHTML = '';
+
+            if (results.length === 0) {
+                container.style.display = 'none';
+                emptyMsg.style.display = 'block';
+                return;
+            }
+
+            emptyMsg.style.display = 'none';
+            container.style.display = 'block';
+
+            // Calculate total consumption + paid total
+            let totalAmount = 0;
+            let totalPaid = 0;
+            results.forEach(({ b }) => {
+                const c = safeEvalConsumption(b.consumption) + safeEvalConsumption(b.minConsumption);
+                totalAmount += c;
+                if (b.isPaid === 'yes' || b.isPaid === true) totalPaid += c;
+            });
+            const totalUnpaid = totalAmount - totalPaid;
+
+            // Total box
+            const totalBox = document.getElementById('staff-total-box');
+            totalBox.innerHTML = `
+                <div>
+                    <div style="font-size:11px;opacity:0.75;letter-spacing:1px;margin-bottom:2px;">ΣΥΝΟΛΟ ΚΑΤΑΝΑΛΩΣΗΣ</div>
+                    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;">👤 ${staffName}</div>
+                    <div style="font-size:11px;margin-top:6px;display:flex;gap:10px;">
+                        <span style="background:rgba(255,255,255,0.15);border-radius:8px;padding:3px 9px;">✅ Πληρωμένο: <strong>${totalPaid > 0 ? totalPaid + '€' : '—'}</strong></span>
+                        <span style="background:rgba(255,0,0,0.2);border-radius:8px;padding:3px 9px;">⭕ Υπόλοιπο: <strong>${totalUnpaid > 0 ? totalUnpaid + '€' : '—'}</strong></span>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:30px;font-weight:900;">${totalAmount > 0 ? totalAmount + '€' : '—'}</div>
+                    <div style="font-size:11px;opacity:0.75;">${results.length} κράτηση${results.length !== 1 ? 'εις' : ''}</div>
+                </div>
+            `;
+
+            // Header
+            document.getElementById('staff-results-title').textContent = `Κρατήσεις ${staffName}`;
+            document.getElementById('staff-results-count').textContent = results.length + ' σύνολο';
+
+            // Status labels / colors
+            const statusMeta = {
+                reserved: { label: 'Κράτηση', color: '#ef233c', bg: '#fee2e2' },
+                special:  { label: 'Special',  color: '#7c3aed', bg: '#ede9fe' },
+                together: { label: 'Κρ. Μαζί', color: '#92400e', bg: '#fef3c7' },
+                vip:      { label: 'Reserved',  color: '#ff00aa', bg: '#ffe0f5' },
+            };
+
+            results.forEach(({ num, b }) => {
+                const isPaid = b.isPaid === 'yes' || b.isPaid === true;
+                const cons = safeEvalConsumption(b.consumption);
+                const minCons = safeEvalConsumption(b.minConsumption);
+                const total = cons + minCons;
+                const meta = statusMeta[b.status] || { label: b.status, color: '#64748b', bg: '#f1f5f9' };
+
+                // togetherType sub-label
+                let subTypeLabel = '';
+                if (b.status === 'together' && b.togetherType) {
+                    const tMap = { reserved: '🔴 Κράτηση', hotel: '🏨 Ξενοδ.', special: '⭐ Special', vip: '🌟 Reserved' };
+                    subTypeLabel = ' · ' + (tMap[b.togetherType] || b.togetherType);
+                }
+
+                // Linked umbrella numbers for "together"
+                let linkedHtml = '';
+                if (b.status === 'together') {
+                    const rawLinked = b.linkedNums || (b.customer ? getLinkedNums(num, b.customer) : '');
+                    const linkedArr = rawLinked.split(/[\s·,]+/).map(n => n.trim()).filter(n => n !== '');
+                    if (linkedArr.length > 0) {
+                        const chips = linkedArr.map(n =>
+                            `<span style="display:inline-block;background:#fef3c7;border:1px solid #d97706;color:#92400e;border-radius:6px;padding:1px 6px;font-size:10px;font-weight:800;margin:1px;">${n}</span>`
+                        ).join(' ');
+                        linkedHtml = `<div style="margin-top:4px;">🔗 ${chips}</div>`;
+                    }
+                }
+
+                const row = document.createElement('div');
+                row.className = 'staff-result-row';
+                row.onclick = () => { closeStaffPanel(); openStatusPopup(num); };
+                row.innerHTML = `
+                    <div class="staff-result-num" style="color:${meta.color};">${num}</div>
+                    <div class="staff-result-info">
+                        <div class="staff-result-customer">${b.customer || '<span style="color:#94a3b8;">—</span>'}</div>
+                        <div class="staff-result-meta">
+                            <span class="status-pill" style="background:${meta.bg};color:${meta.color};">${meta.label}${subTypeLabel}</span>
+                            ${b.time ? '⏰ ' + b.time : ''}
+                            ${b.notes ? ' · ' + b.notes : ''}
+                        </div>
+                        ${linkedHtml}
+                    </div>
+                    <div class="staff-result-amount">
+                        <div style="color:${isPaid ? '#16a34a' : '#ef233c'};">${total > 0 ? total + '€' : '—'}</div>
+                        <div style="font-size:10px;color:${isPaid ? '#16a34a' : '#ef233c'};font-weight:700;">${isPaid ? '✅' : '⭕'}</div>
+                        ${minCons ? `<div style="font-size:9px;color:#92400e;font-weight:700;">Min: ${minCons}€</div>` : ''}
+                    </div>
+                `;
+                list.appendChild(row);
+            });
         }
 
         function filterUmbrellas() {
